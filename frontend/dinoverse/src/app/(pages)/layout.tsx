@@ -8,9 +8,9 @@ const PageLayout = ({
 }) => {
 
     return (
-        <div>   
+        <div className={`h-screen flex flex-col overflow-y-clip`}>
             <Navbar />
-            <main> {children} </main>
+            <main className='absolute top-16 bottom-16 w-full py-4 overflow-y-scroll'> {children} </main>
             <Footer />
         </div>
     );
