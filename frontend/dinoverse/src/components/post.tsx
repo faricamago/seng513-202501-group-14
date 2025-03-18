@@ -1,5 +1,5 @@
 import React from "react";
-import { FaUserCircle } from "react-icons/fa";
+import { GiDinosaurRex } from "react-icons/gi";
 
 interface PostProps {
   username: string;
@@ -11,7 +11,7 @@ const Post: React.FC<PostProps> = ({ username, content, className }) => {
   return (
     <div className={`border p-4 rounded-lg shadow-md bg-white flex items-start gap-4 ${className}`}>
       <div className="w-12 h-12 flex-shrink-0">
-        <FaUserCircle className="w-full h-full text-gray-400" />
+        <GiDinosaurRex className="w-full h-full text-gray-400" />
       </div>
       <div className="flex flex-col flex-grow">
         <h3 className="font-bold text-lg text-gray-900">{username}</h3>
