@@ -11,7 +11,7 @@ const PageLayout = ({
     return (
         <div className={`h-screen flex flex-col overflow-y-clip`}>
             <Navbar />
-            <main className={`absolute top-${navbarHeight} bottom-${footerHeight} w-full py-4 overflow-y-scroll`}> {children} </main>
+            <main className={`absolute top-${navbarHeight} bottom-${footerHeight} w-full bg-[var(--verylight-pink)] overflow-y-scroll py-4 px-8`}> {children} </main>
             <Footer />
         </div>
     );
