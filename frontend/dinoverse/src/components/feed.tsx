@@ -3,7 +3,7 @@ import React from 'react';
 import Post from './post';
 
 const posts = [
-    { username: "TinyArmsBigHeart", content: "Why do door handles have to be so high up? This is discrimination.", image: "sample-images/img7.png"},
+    { username: "TinyArmsBigHeart", content: "", image: "sample-images/img7.png"},
     { username: "RexRants", content: "@HerbivoreHero won’t shut up about fiber. Bro, we get it, you **** a lot.", image: "sample-images/img32.png" },
     { username: "HerbivoreHero", content: "Why do carnivores always talk about protein? Ever heard of fiber? (Also @RexRants stop talking about me.)" },
     { username: "AstroDino", content: "Anyone else notice that growing light in the sky? Or am I just being paranoid?", image: "sample-images/img23.png" },
