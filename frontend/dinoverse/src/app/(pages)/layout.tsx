@@ -1,5 +1,6 @@
 import Footer from '@/components/footer';
 import Navbar from '@/components/navbar';
+import { navbarHeight, footerHeight } from '../tailwind-globals';
 
 const PageLayout = ({
     children
@@ -10,7 +11,7 @@ const PageLayout = ({
     return (
         <div className={`h-screen flex flex-col overflow-y-clip`}>
             <Navbar />
-            <main className='absolute top-16 bottom-16 w-full py-4 overflow-y-scroll'> {children} </main>
+            <main className={`absolute top-${navbarHeight} bottom-${footerHeight} w-full py-4 overflow-y-scroll`}> {children} </main>
             <Footer />
         </div>
     );
