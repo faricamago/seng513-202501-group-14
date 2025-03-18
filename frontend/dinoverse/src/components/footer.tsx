@@ -14,9 +14,12 @@ const Footer = () => {
     <div className="flex-1 flex items-center justify-center p-4">
         <LuSchool className="text-3xl" />
     </div>
-    <div className="flex-1 flex items-center justify-center p-4">
-        <FiPlus className="text-3xl" />
-    </div>
+    <div className="flex-1 flex items-center justify-center relative">
+        <div className="bg-white text-[var(--primary-pink)] w-15 h-12 flex items-center justify-center 
+                        rounded-md border-2 border-[var(--primary-pink)] absolute -top-4">
+          <FiPlus className="text-2xl" />
+        </div>
+      </div>
     <div className="flex-1 flex items-center justify-center p-4">
         <MdOutlinePeopleAlt className="text-3xl" />
     </div>
