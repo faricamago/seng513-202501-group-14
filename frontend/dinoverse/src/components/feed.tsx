@@ -4,7 +4,7 @@ import Post from './post';
 
 const posts = [
     { username: "TinyArmsBigHeart", content: "Why do door handles have to be so high up? This is discrimination." },
-    { username: "RexRants", content: "@HerbivoreHero won’t shut up about fiber. Bro, we get it, you poop a lot." },
+    { username: "RexRants", content: "@HerbivoreHero won’t shut up about fiber. Bro, we get it, you **** a lot." },
     { username: "HerbivoreHero", content: "Why do carnivores always talk about protein? Ever heard of fiber? (Also @RexRants stop talking about me.)" },
     { username: "AstroDino", content: "Anyone else notice that growing light in the sky? Or am I just being paranoid?" },
     { username: "DippyLongNeck", content: "The real reason we have long necks is to avoid awkward eye contact at the waterhole." },
