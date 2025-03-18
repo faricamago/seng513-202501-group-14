@@ -1,11 +1,18 @@
 'use client';
 
-import React from 'react'
+import React from 'react';
 
-const Error = () => {
-  return (
-    <div>Error</div>
-  )
+interface ErrorProps {
+    message: string;
 }
 
-export default Error
+const Error: React.FC<ErrorProps> = ({ message }) => {
+    return (
+        <div>
+            <h1>Error</h1>
+            <p>{message}</p>
+        </div>
+    );
+}
+
+export default Error;
