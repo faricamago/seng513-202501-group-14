@@ -73,7 +73,7 @@ const posts = [
 const Feed = () => {
   return (
     <div className="flex flex-col gap-4 px-4">
-      {posts.map((post, index) => (
+      {posts.sort(() => Math.random() - 0.5).map((post, index) => (
         <Post className='w-full' key={index} username={post.username} content={post.content} />
       ))}
     </div>
