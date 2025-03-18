@@ -3,6 +3,11 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --bright-pink: #F24B99;
+  --primary-pink: #F26BAA;
+  --secondary-pink: #F2AEC7;
+  --verylight-pink: #F2D0DD;
+  --dark-color:#594856;
 }
 
 @theme inline {
