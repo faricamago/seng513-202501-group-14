@@ -1,10 +1,8 @@
 import React from 'react';
 
-import { navbarHeight } from '@/app/tailwind-globals';
-
 const Navbar = () => {
   return (
-    <nav className={`flex items-center bg-[var(--primary-pink)] h-${navbarHeight}`}>
+    <nav className={`fixed top-0 left-0 w-full h-16 z-40 bg-[var(--primary-pink)] flex items-center`}>
       <div className="w-1/8 items-center justify-items-center">
         <img src="/assets/DinoLogo.png" alt="Logo" className="w-20 h-[calc(100%-16px)]" />
       </div>
