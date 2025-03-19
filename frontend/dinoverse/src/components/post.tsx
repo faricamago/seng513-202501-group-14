@@ -1,5 +1,6 @@
 import React from "react";
 import { GiDinosaurRex } from "react-icons/gi";
+import ResponsiveImage from "./responsive-image";
 
 interface PostProps {
   username: string;
@@ -18,7 +19,7 @@ const Post: React.FC<PostProps> = ({ username, content, image, className }) => {
         <h3 className="font-bold text-lg text-gray-900">{username}</h3>
         <p className="text-gray-700 mt-1 leading-relaxed">{content}</p>
         {image && (
-          <img src={image} alt="Post image" className="mt-3 rounded-lg w-64 h-auto" />
+          <ResponsiveImage src={image} alt="Post image" className="mt-3 rounded-lg w-64 h-auto" />
         )}
         <div className="flex space-x-4 mt-3 text-sm text-gray-500">
           <button className="hover:text-blue-500 transition">Like</button>
