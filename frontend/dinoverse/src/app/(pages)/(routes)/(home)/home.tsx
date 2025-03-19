@@ -4,7 +4,7 @@ import React from 'react'
 const Home = () => {
   return (
     <div>
-        <Feed className='w-3/4'/>
+        <Feed className='w-full'/>
     </div>
   )
 }
