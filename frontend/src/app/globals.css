@@ -3,12 +3,24 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-  --bright-pink: #F24B99;
-  --primary-pink: #F26BAA;
-  --secondary-pink: #F2AEC7;
-  --verylight-pink: #F2D0DD;
+  --bright-pink: #ccaedb;
+  --primary-pink: #b195c0;
+  --secondary-pink: #dcc0ec;
+  --verylight-pink: #efdff9;
   --dark-color:#594856;
 }
+
+/* for pink */
+/* :root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --bright-pink: #F7AFBB;
+  --primary-pink: #EF7B8E;
+  --secondary-pink: #FBCCD4;
+  --verylight-pink: #FDEDEE;
+  --dark-color:#594856;
+} */
+
 
 @theme inline {
   --color-background: var(--background);
