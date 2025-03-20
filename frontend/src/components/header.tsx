@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { LuLogOut } from "react-icons/lu";
 import { useRouter } from 'next/navigation';
 
-const Navbar = () => {
+const Header = () => {
   const [username, setUsername] = useState('');
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const router = useRouter();
@@ -24,8 +24,8 @@ const Navbar = () => {
   };
 
   return (
-    <>
-      <nav className="fixed top-0 left-0 w-full h-20 z-40 bg-[var(--primary-pink)] flex items-center px-4">
+    <header>
+      <div className="fixed top-0 left-0 w-full h-20 z-40 bg-[var(--primary-pink)] flex items-center px-4">
         <Link href="/" className="w-1/8 flex items-center justify-center">
           <img src="/assets/DinoLogo.png" alt="Logo" className="w-20 h-[calc(100%-16px)]" />
         </Link>
@@ -34,7 +34,7 @@ const Navbar = () => {
         </div>
         {username && (<button onClick={() => setShowLogoutModal(true)} className="w-1/8 flex items-center justify-center"><LuLogOut className="text-3xl text-white" /></button>
         )}
-      </nav>
+      </div>
 
       {showLogoutModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-[rgba(0,0,0,0.5)] z-50">
@@ -50,8 +50,8 @@ const Navbar = () => {
           </div>
         </div>
       )}
-    </>
+    </header>
   );
 };
 
-export default Navbar;
+export default Header;
