@@ -33,13 +33,9 @@ import {
   MdFormatAlignLeft,
   MdFormatAlignRight,
 } from "react-icons/md";
-import { BsListOl, BsListUl } from "react-icons/bs";
 import { IoImagesSharp } from "react-icons/io5";
 import { IoMdLink } from "react-icons/io";
 
-//
-// Utility to highlight active buttons
-//
 function getButtonClasses(isActive: boolean) {
   return `
     p-2 mx-1 rounded 
@@ -186,24 +182,8 @@ const MenuBar: React.FC = () => {
         >
           <IoImagesSharp />
         </button>
-        <button
-          onClick={setLink}
-          className={getButtonClasses(editor.isActive("link"))}
-        >
-          <IoMdLink />
-        </button>
       </div>
     </div>
-  );
-};
-
-const EditorContentWrapper: React.FC<{ className?: string }> = ({ className }) => {
-  const { editor } = useCurrentEditor();
-  return (
-    <EditorContent
-      editor={editor}
-      className={`p-4 ${className ?? ""}`}
-    />
   );
 };
 
@@ -214,7 +194,7 @@ const extensions = [
   Image.configure({ inline: true }),
   Placeholder.configure({
     emptyEditorClass:
-      "before:content-[attr(data-placeholder)] before:block before:text-gray-400 before:pointer-events-none p-4",
+      "before:content-[attr(data-placeholder)] before:block before:text-gray-400 before:pointer-events-none",
     placeholder: "Content...",
   }),
   StarterKit.configure({
@@ -260,6 +240,7 @@ const TipTapEditor: React.FC<TipTapEditorProps> = ({ content = "" }) => {
       <EditorProvider
         extensions={extensions}
         content={content}
+        immediatelyRender={false} 
         slotBefore={
           <div className="flex-none">
             <div className="p-2">
@@ -278,10 +259,6 @@ const TipTapEditor: React.FC<TipTapEditorProps> = ({ content = "" }) => {
           </div>
         }
       >
-        {/* Outer container can have minimal padding; the real padding is on the .ProseMirror itself */}
-        <div className="flex-grow overflow-y-auto">
-          <EditorContentWrapper />
-        </div>
       </EditorProvider>
     </div>
   );

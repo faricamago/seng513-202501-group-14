@@ -10,6 +10,13 @@
   --dark-color:#594856;
 }
 
+.ProseMirror-focused:focus {
+  @apply outline-none;
+}
+.ProseMirror p{
+  @apply outline-none p-4;
+}
+
 /* for pink */
 /* :root {
   --background: #ffffff;
