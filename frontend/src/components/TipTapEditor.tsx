@@ -34,13 +34,12 @@ import {
   MdFormatAlignRight,
 } from "react-icons/md";
 import { IoImagesSharp } from "react-icons/io5";
-import { IoMdLink } from "react-icons/io";
 
 function getButtonClasses(isActive: boolean) {
   return `
     p-2 mx-1 rounded 
     hover:bg-gray-200
-    ${isActive ? "bg-blue-100 text-blue-700" : "text-gray-600"}
+    ${isActive ? "bg-[var(--secondary-pink)] text-[var(--dark-color)]" : "text-gray-600"}
   `;
 }
 
