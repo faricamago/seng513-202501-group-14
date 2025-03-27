@@ -9,6 +9,6 @@ const postSchema = new Schema({
   images: [{ type: String }],
   category: { type: String, enum: ['announcement', 'event', 'blog', 'update'] },
   reported: { type: Boolean, default: false }
-}, { timestamps: true,collection: 'Post' });
+}, { timestamps: true});
 
 module.exports = mongoose.model('Post', postSchema);
