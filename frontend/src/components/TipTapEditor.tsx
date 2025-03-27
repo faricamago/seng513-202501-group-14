@@ -244,7 +244,7 @@ const TipTapEditor: React.FC<TipTapEditorProps> = ({ content = "" }) => {
           <div className="flex-none">
             <div className="p-2">
               <label className="block text-gray-700 font-semibold mb-1">
-                Title (Required)
+                Title*
               </label>
               <input
                 type="text"

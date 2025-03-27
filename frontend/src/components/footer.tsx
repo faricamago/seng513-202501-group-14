@@ -66,12 +66,12 @@ const Footer: React.FC = () => {
       {showPostModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-[rgba(0,0,0,0.5)] z-50">
         <div className="bg-white rounded-xl shadow-2xl max-w-md w-full mx-auto max-h-[90vh] flex flex-col">
-          <h2 className="text-2xl font-bold text-center mb-4 p-4">Add a Post</h2>
+          <h2 className="text-2xl font-bold text-[var(--dark-color)] text-center mb-4 p-4">Add a Post</h2>
           <div className="flex-grow overflow-y-auto p-4">
             <TipTapEditor content="" />
           </div>
           <div className="flex justify-center space-x-4 p-4">
-            <button onClick={() => setShowPostModal(false)} className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
+            <button onClick={() => setShowPostModal(false)} className="px-4 py-2 text-[var(--dark-color)] bg-gray-300 rounded hover:bg-gray-400">
               Cancel
             </button>
             <button onClick={confirmPost} className="px-4 py-2 bg-[var(--primary-pink)] text-white rounded hover:bg-[var(--bright-pink)]">
