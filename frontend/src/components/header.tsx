@@ -25,9 +25,9 @@ const Header = () => {
 
   return (
     <header>
-      <div className="fixed top-0 left-0 w-full h-20 z-40 bg-[var(--primary-pink)] flex items-center px-4">
+      <div className="fixed top-0 left-0 w-full h-20 z-40 bg-[var(--primary-pink)] flex items-center px-4 border-b-8 border-[var(--uoc-yellow)]">
         <Link href="/" className="w-1/8 flex items-center justify-center">
-          <img src="/assets/DinoLogo.png" alt="Logo" className="w-20 h-[calc(100%-16px)]" />
+          <img src="/assets/cuteredlogo.png" alt="Logo" className="w-20 h-[calc(100%-16px)]" />
         </Link>
         <div className="w-6/8 flex items-center justify-center">
           <input type="text" placeholder="Search..." className="w-full px-4 py-2 border border-gray-300 text-[var(--dark-color)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--verylight-pink)] bg-white/50"/>
