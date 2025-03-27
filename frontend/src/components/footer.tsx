@@ -10,7 +10,8 @@ import TipTapEditor from "./TipTapEditor"; // adjust the path as needed
 const Footer: React.FC = () => {
   const [username, setUsername] = useState("");
   const [showPostModal, setShowPostModal] = useState(false);
-
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [loginMessage, setLoginMessage] = useState("");
   useEffect(() => {
     const storedUsername = sessionStorage.getItem("username");
     if (storedUsername) {
@@ -29,8 +30,29 @@ const Footer: React.FC = () => {
     if (username) {
       setShowPostModal(true);
     } else {
-      window.location.href = "/login";
+      setLoginMessage("In order to add a post you need to login.");
+      setShowLoginModal(true);
     }
+  };
+  const handleFollowersClick = () => {
+    if (username) {
+      // Make it do whatever it is supposed to do
+    } else {
+      setLoginMessage("In order to see your followers' post, you need to login.");
+      setShowLoginModal(true);
+    }
+  };
+  const handleProfileClick = () => {
+    if (username) {
+        window.location.href = "/login";
+    } else {
+      setLoginMessage("In order to see your profile, you need to login.");
+      setShowLoginModal(true);
+    }
+  };
+  const goToLogin = () => {
+    setShowLoginModal(false);
+    window.location.href = "/login";
   };
 
   const accountRoute = username ? "/profile" : "/login";
@@ -53,15 +75,12 @@ const Footer: React.FC = () => {
             <FiPlus className="text-2xl" />
           </div>
         </div>
-        <div className="flex-1 flex items-center justify-center p-4 hover:bg-[var(--bright-pink)]">
+        <div className="flex-1 flex items-center justify-center p-4 hover:bg-[var(--bright-pink)] "  onClick={handleFollowersClick}>
           <MdOutlinePeopleAlt className="text-3xl" />
         </div>
-        <Link
-          href={accountRoute}
-          className="flex-1 flex items-center justify-center p-4 hover:bg-[var(--bright-pink)] cursor-pointer"
-        >
+        <div className="flex-1 flex items-center justify-center p-4 hover:bg-[var(--bright-pink)] "  onClick={handleProfileClick}>
           <MdOutlinePersonOutline className="text-3xl" />
-        </Link>
+        </div>
       </nav>
       {showPostModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-[rgba(0,0,0,0.5)] z-50">
@@ -80,6 +99,20 @@ const Footer: React.FC = () => {
           </div>
         </div>
       </div>      
+      )}
+      {showLoginModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-[rgba(0,0,0,0.5)] z-50">
+          <div className="bg-white p-8 rounded-xl shadow-2xl max-w-md mx-auto transform transition-all duration-300 hover:scale-105">
+            <h2 className="text-[var(--dark-color)] text-2xl font-bold text-center mb-4">Please Login</h2>
+            <p className="text-gray-700 text-center mb-6">{loginMessage}</p>
+            <div className="flex justify-center space-x-4">
+              <button onClick={() => setShowLoginModal(false)} className="px-4 py-2 bg-gray-300 text-[var(--dark-color)] rounded hover:bg-gray-400 transition">Cancel</button>
+              <button onClick={goToLogin} className="px-4 py-2 bg-[var(--primary-pink)] text-white rounded hover:bg-[var(--bright-pink)] transition">
+                Login
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </footer>
   );
