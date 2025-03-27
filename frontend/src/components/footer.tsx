@@ -59,7 +59,7 @@ const Footer: React.FC = () => {
 
   return (
     <footer>
-      <nav className="fixed bottom-0 left-0 w-full h-16 z-40 flex bg-[var(--primary-pink)] text-white">
+      <nav className="fixed bottom-0 left-0 w-full h-16 z-40 flex bg-[var(--primary-pink)] text-white border-t-8 border-[var(--uoc-yellow)]">
         <div className="flex-1 flex items-center justify-center p-4 hover:bg-[var(--bright-pink)]">
           <LuEarth className="text-3xl" />
         </div>
