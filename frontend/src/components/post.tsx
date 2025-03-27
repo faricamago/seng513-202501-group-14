@@ -11,7 +11,7 @@ interface PostProps {
 
 const Post: React.FC<PostProps> = ({ username, content, image, className }) => {
   return (
-    <div className={`border-2 border-[var(--primary-pink)] rounded-lg bg-white shadow-md ${className}`}>
+    <div className={`border-2 border-[var(--uoc-yellow)] rounded-lg bg-white shadow-md ${className}`}>
       <div className={`p-4 flex items-start gap-4`}>
         <div className="w-12 h-12 flex-shrink-0">
           <GiDinosaurRex className="w-full h-full text-gray-400" />
