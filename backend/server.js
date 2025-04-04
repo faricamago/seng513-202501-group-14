@@ -3,6 +3,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cors = require("cors");
+const path = require('path');
+
 
 // Load environment variables from .env file
 dotenv.config();
@@ -26,6 +28,7 @@ const postRoutes = require('./routes/post');
 
 app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 // Simple test route
 app.get('/', (req, res) => {
