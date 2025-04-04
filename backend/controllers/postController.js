@@ -1,8 +1,39 @@
 // controllers/postController.js
+const path = require('path');
 const Post = require('../models/Post');
 
-// Retrieve all posts
-exports.getPosts = async (req, res) => {
+const createPost = async (req, res) => {
+  try {
+    const { title, content, user } = req.body;
+    let imagePaths = [];
+
+    if (req.files && req.files.length > 0) {
+      // Convert each file's path to a relative path.
+      // Assuming your uploads folder is in your project root,
+      // you can use path.relative() to get the relative path.
+      imagePaths = req.files.map(file => {
+        // Compute the relative path from your project root (process.cwd())
+        const relativePath = path.relative(process.cwd(), file.path);
+        return relativePath;
+      });
+    }
+
+    // Construct the post data including title and an array of image paths
+    const postData = { title, content, user, images: imagePaths };
+
+    // Save the post document to MongoDB
+    const post = await Post.create(postData);
+
+    res.status(201).json({
+      message: "Post created successfully",
+      post
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const getPosts = async (req, res) => {
   try {
     const posts = await Post.find().populate('user', 'name email');
     res.status(200).json(posts);
@@ -11,13 +42,7 @@ exports.getPosts = async (req, res) => {
   }
 };
 
-// Create a new post
-exports.createPost = async (req, res) => {
-  try {
-    const newPost = new Post(req.body);
-    await newPost.save();
-    res.status(200).json(newPost);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+module.exports = {
+  getPosts,
+  createPost
 };
