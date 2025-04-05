@@ -18,14 +18,74 @@ exports.registerUser = async (req, res) => {
 
 // User login endpoint
 exports.loginUser = async (req, res) => {
+try {
+  const user = await User.findOne({ email: req.body.email });
+  if (!user || user.password !== req.body.password) {
+    return res.status(401).json({ error: 'Invalid credentials' });
+  }
+  // In production, generate and return an authentication token here.
+  res.status(200).json({ message: 'Login successful', user });
+} catch (err) {
+  res.status(500).json({ error: err.message });
+}
+};
+
+// Follow a user
+exports.followUser = async (req, res) => {
   try {
-    const user = await User.findOne({ email: req.body.email });
-    if (!user || user.password !== req.body.password) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+    const { follower, following } = req.body;
+    if (follower === following) {
+      return res.status(400).json({ error: "Cannot follow yourself" });
     }
-    // In production, generate and return an authentication token here.
-    res.status(200).json({ message: 'Login successful', user });
+    // Update the follower's following list and the following user's followers list.
+    await User.findOneAndUpdate(
+      { username: follower },
+      { $addToSet: { following: following } },
+      { new: true }
+    );
+    await User.findOneAndUpdate(
+      { username: following },
+      { $addToSet: { followers: follower } },
+      { new: true }
+    );
+    res.status(200).json({ message: "Follow successful" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
+
+// Get the list of users that a given user is following
+exports.getFollowing = async (req, res) => {
+  try {
+    const { username } = req.query;
+    const user = await User.findOne({ username });
+    if (!user) return res.status(404).json({ error: "User not found" });
+    res.status(200).json(user.following || []);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// Unfollow a user
+exports.unfollowUser = async (req, res) => {
+  console.log("unfollowUser called with body:", req.body);
+    try {
+      const { follower, following } = req.body;
+      if (follower === following) {
+        return res.status(400).json({ error: "Cannot unfollow yourself" });
+      }
+      await User.findOneAndUpdate(
+        { username: follower },
+        { $pull: { following: following } },
+        { new: true }
+      );
+      await User.findOneAndUpdate(
+        { username: following },
+        { $pull: { followers: follower } },
+        { new: true }
+      );
+      res.status(200).json({ message: "Unfollow successful" });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  };

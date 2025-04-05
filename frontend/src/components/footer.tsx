@@ -68,13 +68,14 @@ const Footer: React.FC = () => {
   };
 
   const handleFollowersClick = () => {
-    if (username) {
-      // Make it do whatever it is supposed to do
-    } else {
-      setLoginMessage("In order to see your followers' post, you need to login.");
-      setShowLoginModal(true);
-    }
-  };
+        if (username) {
+          // Navigate to feed page with filter parameter set to "following"
+          window.location.href = "/feed?filter=following";
+        } else {
+          setLoginMessage("In order to see your followers' posts, you need to login.");
+          setShowLoginModal(true);
+        }
+      };
 
   const handleProfileClick = () => {
     if (username) {

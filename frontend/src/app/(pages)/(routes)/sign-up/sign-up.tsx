@@ -2,7 +2,8 @@
 import React, { useState } from 'react';
 
 const SignUp = () => {
-  const [name, setName] = useState('');
+  // const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -24,7 +25,7 @@ const SignUp = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          name,
+          username,
           email,
           password,
         }),
@@ -52,8 +53,8 @@ const SignUp = () => {
         {result && <p className="text-black text-center mb-4">{result}</p>}
         <form onSubmit={handleSignup}>
           <div className="mb-4">
-            <label htmlFor="name" className="block text-[var(--dark-color)]">Full Name</label>
-            <input type="text" id="name" value={name} onChange={(e) => setName(e.target.value)} required className="w-full px-3 py-2 border-[var(--primary-pink)] bg-[var(--verylight-pink)] text-[var(--dark-color)] rounded focus:outline-none focus:ring focus:border-[var(--primary-pink)]"/>
+            <label htmlFor="username" className="block text-[var(--dark-color)]">Username</label>
+            <input type="text" id="username" value={username} onChange={(e) => setUsername(e.target.value)} required className="w-full px-3 py-2 border-[var(--primary-pink)] bg-[var(--verylight-pink)] text-[var(--dark-color)] rounded focus:outline-none focus:ring focus:border-[var(--primary-pink)]"/>
           </div>
           <div className="mb-4">
             <label htmlFor="email" className="block text-[var(--dark-color)]">Email</label>

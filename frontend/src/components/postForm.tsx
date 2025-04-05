@@ -23,6 +23,7 @@ const PostForm: React.FC<PostFormProps> = ({ onCancel, onPost }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onPost({ title, content, images });
+    window.location.href = "/profile";
   };
 
   return (
