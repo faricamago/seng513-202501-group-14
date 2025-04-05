@@ -84,7 +84,11 @@ useEffect(() => {
       {loggedInUser && loggedInUser !== profileUsername && (
         <button 
           onClick={handleFollowToggle}
-          className="px-4 py-2 bg-[var(--primary-pink)] text-white rounded hover:bg-[var(--bright-pink)] hover:cursor-pointer mt-2"
+          className={`px-4 py-2 rounded hover:cursor-pointer mt-2 border border-2 border-[var(--primary-pink)] ${
+            isFollowing 
+              ? "bg-white text-red-500 hover:bg-red-100" 
+              : "bg-[var(--primary-pink)] text-white hover:bg-[var(--bright-pink)]"
+          }`}
         >
           {followStatus}
         </button>
