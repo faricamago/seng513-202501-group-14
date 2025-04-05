@@ -78,7 +78,7 @@ const Footer: React.FC = () => {
 
   const handleProfileClick = () => {
     if (username) {
-      window.location.href = "/login";
+      window.location.href = "/profile";
     } else {
       setLoginMessage("In order to see your profile, you need to login.");
       setShowLoginModal(true);
