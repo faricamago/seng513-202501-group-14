@@ -3,16 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from 'next/navigation';
 import Post from "./post";
-
-interface PostType {
-  _id: string;
-  username: string;
-  title: string;
-  content: string;
-  images?: string[];
-  createdAt: string; // Added createdAt property
-  announcement: boolean;
-}
+import { PostType } from "./post";
 
 interface FeedProps {
   className?: string;
@@ -90,11 +81,15 @@ const Feed: React.FC<FeedProps> = ({ className, filterBy, filterByUser }) => {
     <div className={`flex flex-col gap-4 ${className}`}>
       {posts.map((post) => (
         <div key={post._id} className="w-full">
-          <Post 
+          <Post
+            _id={post._id}
             username={post.username}
             title={post.title}
             content={post.content}
             images={post.images}
+            announcement={post.announcement}
+            createdAt={post.createdAt}
+            likes={post.likes}
           />
         </div>
       ))}
