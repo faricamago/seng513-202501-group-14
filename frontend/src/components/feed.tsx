@@ -6,20 +6,21 @@ import Post from "./post";
 
 interface PostType {
   _id: string;
-  user: string;
+  username: string;
   title: string;
   content: string;
   images?: string[];
   createdAt: string; // Added createdAt property
+  announcement: boolean;
 }
 
 interface FeedProps {
   className?: string;
-  filterBy?: "following" | "mine";
+  filterBy?: "following" | "mine" | "announcements";
   filterByUser?: string;
 }
 
-const Feed: React.FC<FeedProps> = ({ className, filterBy,filterByUser }) => {
+const Feed: React.FC<FeedProps> = ({ className, filterBy, filterByUser }) => {
   const [posts, setPosts] = useState<PostType[]>([]);
   const searchParams = useSearchParams();
   const filterQuery = searchParams.get("filter");
@@ -47,15 +48,19 @@ const Feed: React.FC<FeedProps> = ({ className, filterBy,filterByUser }) => {
             const followRes = await fetch(`http://localhost:5000/api/users/following?username=${loggedInUsername}`);
             if (!followRes.ok) throw new Error("Failed to fetch following list");
             const followingList: string[] = await followRes.json();
-            processedPosts = processedPosts.filter(post => followingList.includes(post.user));
+            processedPosts = processedPosts.filter(post => followingList.includes(post.username));
           }
+        } else if (filterBy === "announcements") {
+
+          processedPosts = processedPosts.filter(post => {post.announcement === true});
+
         } else if (filterBy === "mine") {
           const loggedInUsername = sessionStorage.getItem("username");
           if (loggedInUsername) {
-            processedPosts = processedPosts.filter(post => post.user === loggedInUsername);
+            processedPosts = processedPosts.filter(post => post.username === loggedInUsername);
           }
         }else if (filterByUser) {
-             processedPosts = processedPosts.filter(post => post.user === filterByUser);
+             processedPosts = processedPosts.filter(post => post.username === filterByUser);
            }
 
         // Sort posts by createdAt date in descending order (latest first)
@@ -86,7 +91,7 @@ const Feed: React.FC<FeedProps> = ({ className, filterBy,filterByUser }) => {
       {posts.map((post) => (
         <div key={post._id} className="w-full">
           <Post 
-            username={post.user}
+            username={post.username}
             title={post.title}
             content={post.content}
             images={post.images}

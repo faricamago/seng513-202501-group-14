@@ -6,7 +6,7 @@ const fs = require('fs');
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     // Get the user id from the request body
-    const userId = req.body.user;
+    const userId = req.body.username;
     // Create a directory path such as "./uploads/<userId>"
     const uploadPath = path.join(__dirname, '../uploads', userId);
     fs.mkdirSync(uploadPath, { recursive: true });

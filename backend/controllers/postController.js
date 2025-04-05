@@ -4,7 +4,7 @@ const Post = require('../models/Post');
 
 const createPost = async (req, res) => {
   try {
-    const { title, content, user } = req.body;
+    const { title, content, username } = req.body;
     let imagePaths = [];
 
     if (req.files && req.files.length > 0) {
@@ -19,7 +19,7 @@ const createPost = async (req, res) => {
     }
 
     // Construct the post data including title and an array of image paths
-    const postData = { title, content, user, images: imagePaths };
+    const postData = { title, content, username, images: imagePaths };
 
     // Save the post document to MongoDB
     const post = await Post.create(postData);
@@ -35,7 +35,7 @@ const createPost = async (req, res) => {
 
 const getPosts = async (req, res) => {
   try {
-    const posts = await Post.find().populate('user', 'name email');
+    const posts = await Post.find().populate('username', 'name email');
     res.status(200).json(posts);
   } catch (err) {
     res.status(500).json({ error: err.message });
