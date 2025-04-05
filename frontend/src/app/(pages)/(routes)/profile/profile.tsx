@@ -23,6 +23,7 @@ const Profile = () => {
       <p className="mt-2 mb-6 text-center text-gray-600 max-w-md">
         Trixie may be a T-Rex, but she's all heart! Despite her fierce reputation, she's a playful, curious little dino with a contagious smile. 
       </p>
+      {/* <button className="px-4 py-2 bg-[var(--primary-pink)] text-white rounded hover:bg-[var(--bright-pink)] hover:cursor-pointer w-1/4">Follow</button> */}
       <Feed className='w-full'/>
     </div>
   );

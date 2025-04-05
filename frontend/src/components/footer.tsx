@@ -95,9 +95,9 @@ const Footer: React.FC = () => {
   return (
     <footer>
       <nav className="fixed bottom-0 left-0 w-full h-16 z-40 flex bg-[var(--primary-pink)] text-white border-t-8 border-[var(--uoc-yellow)]">
-        <div className="flex-1 flex items-center justify-center p-4 hover:bg-[var(--bright-pink)]">
-          <LuEarth className="text-3xl" />
-        </div>
+      <Link href="/" className="flex-1 flex items-center justify-center p-4 hover:bg-[var(--bright-pink)] hover:cursor-pointer" >
+            <LuEarth className="text-3xl" />
+        </Link>
         <div className="flex-1 flex items-center justify-center p-4 hover:bg-[var(--bright-pink)]">
           <LuSchool className="text-3xl" />
         </div>
@@ -113,7 +113,7 @@ const Footer: React.FC = () => {
         <div className="flex-1 flex items-center justify-center p-4 hover:bg-[var(--bright-pink)]" onClick={handleFollowersClick}>
           <MdOutlinePeopleAlt className="text-3xl" />
         </div>
-        <div className="flex-1 flex items-center justify-center p-4 hover:bg-[var(--bright-pink)]" onClick={handleProfileClick}>
+        <div className="flex-1 flex items-center justify-center p-4 hover:bg-[var(--bright-pink)] hover:cursor-pointer" onClick={handleProfileClick}>
           <MdOutlinePersonOutline className="text-3xl" />
         </div>
       </nav>
