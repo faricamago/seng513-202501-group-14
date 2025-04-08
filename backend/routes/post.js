@@ -10,7 +10,11 @@ router.get('/', postController.getPosts);
 // Create a new post
 router.post('/', upload.array('images'), postController.createPost);
 
-// Report a post
+// Toggle post like
 router.post('/like', postController.togglePostLike);
 
+// Report a post
+router.post('/report', postController.reportPost);
+
 module.exports = router;
+

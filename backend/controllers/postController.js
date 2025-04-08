@@ -75,8 +75,31 @@ const togglePostLike = async (req, res) => {
   }
 };
 
+const reportPost = async (req, res) => {
+  try {
+    const { postId, reportedBy } = req.body;
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+
+    // Mark the post as reported
+    post.reported = true;
+    
+    await post.save();
+
+    res.status(200).json({
+      message: "Post reported successfully",
+      post
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   getPosts,
   createPost,
-  togglePostLike
+  togglePostLike,
+  reportPost
 };

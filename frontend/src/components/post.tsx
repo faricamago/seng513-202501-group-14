@@ -7,6 +7,7 @@ import { useEffect } from "react";
 import { BiLike } from "react-icons/bi";
 import { BiSolidLike } from "react-icons/bi";
 import { FaRegComment } from "react-icons/fa";
+import { FaRegFlag } from "react-icons/fa";
 
 export interface PostType {
   _id: string;
@@ -61,6 +62,30 @@ const Post: React.FC<PostType> = (props) => {
       console.error(err);
     }
   }
+  const reportPost = async (postId: string) => {
+    const loggedInUsername = sessionStorage.getItem("username");
+    if (!loggedInUsername) {
+      alert("Please log in to report a post.");
+      return;
+    }
+    try {
+      const res = await fetch("http://localhost:5000/api/posts/report", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          postId,
+          reportedBy: loggedInUsername,
+        }),
+      });
+      if (!res.ok) {
+        throw new Error("Failed to report the post");
+      }
+      alert("Post reported successfully");
+    } catch (error) {
+      console.error("Error reporting post:", error);
+    }
+  };
+
 
   return (
     <div className={`border-2 border-[var(--uoc-yellow)] rounded-lg bg-white shadow-md ${props.className}`}>
@@ -123,14 +148,24 @@ const Post: React.FC<PostType> = (props) => {
 
         {/* Comments */}
         <div className='flex items-center gap-2'>
-          <button className="hover:text-blue-500 transition  text-2xl">
+          <button className="hover:text-blue-500 transition text-2xl">
             <FaRegComment />
           </button>
           <span className="text-md font-bold">
             42
           </span>
         </div>
-        
+        {/* Report */}
+        <div className="flex items-center gap-2">
+            <button
+              className="flex items-center gap-1 px-3 py-1 hover:text-blue-500 transition transition"
+              onClick={() => reportPost(props._id)}
+            >
+              <FaRegFlag className="text-2xl" />
+              <span>Report</span>
+            </button>
+        </div>
+
       </div>
     </div>
   );

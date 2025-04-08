@@ -24,8 +24,14 @@ const Login = () => {
       const data = await res.json();
       // Store the returned username (from the database) for further use.
       sessionStorage.setItem("username", data.user.username);
+      sessionStorage.setItem("role", data.user.role);
       console.log("Logged in with username:", data.user.username);
-      window.location.href = '/profile';
+      // Redirect based on user role: admin goes to /admin, others to /profile
+      if (data.user.role === "admin") {
+        window.location.href = '/admin';
+      } else {
+        window.location.href = '/profile';
+      }
     } catch (error) {
       console.error(error);
       alert("Login error");
