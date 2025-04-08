@@ -4,7 +4,7 @@ const Post = require('../models/Post');
 
 const createPost = async (req, res) => {
   try {
-    const { title, content, user } = req.body;
+    const { title, content, username } = req.body;
     let imagePaths = [];
 
     if (req.files && req.files.length > 0) {
@@ -19,7 +19,7 @@ const createPost = async (req, res) => {
     }
 
     // Construct the post data including title and an array of image paths
-    const postData = { title, content, user, images: imagePaths };
+    const postData = { title, content, username, images: imagePaths };
 
     // Save the post document to MongoDB
     const post = await Post.create(postData);
@@ -35,14 +35,48 @@ const createPost = async (req, res) => {
 
 const getPosts = async (req, res) => {
   try {
-    const posts = await Post.find().populate('user', 'name email');
+    const posts = await Post.find().populate('username', 'name email');
     res.status(200).json(posts);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
 
+const togglePostLike = async (req, res) => {
+
+  console.log("togglePostLike called with body:", req.body);
+
+  try {
+    const { _id, loggedInUsername } = req.body;
+    const post = await Post.findById(_id);
+    if (!post) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+
+    // Check if the user already liked the post
+    const alreadyLiked = post.likes.includes(loggedInUsername);
+    if (alreadyLiked) {
+      // Remove the user from the likes array
+      post.likes = post.likes.filter(user => user !== loggedInUsername);
+    } else {
+      // Add the user to the likes array
+      post.likes.push(loggedInUsername);
+    }
+
+    // Save the updated post
+    await post.save();
+
+    res.status(200).json({
+      message: 'Post like status updated successfully',
+      likes: post.likes
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   getPosts,
-  createPost
+  createPost,
+  togglePostLike
 };

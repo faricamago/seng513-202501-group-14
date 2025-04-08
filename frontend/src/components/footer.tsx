@@ -37,7 +37,7 @@ const Footer: React.FC = () => {
     const formData = new FormData();
     formData.append("title", data.title);
     formData.append("content", data.content);
-    formData.append("user", username); // Replace with the actual user id
+    formData.append("username", username); // Replace with the actual user id
     // Append each image file (the field name 'images' must match the server-side expectation)
     data.images.forEach((file) => {
       formData.append("images", file);
@@ -67,15 +67,28 @@ const Footer: React.FC = () => {
     }
   };
 
+  const handleWorldClick = () => {
+    window.location.href = "/";
+  }
+
+  const handleAnnouncementsClick = () => {
+    if (username) {
+      window.location.href = "/?filter=announcements";
+    } else {
+      setLoginMessage("In order to see your followers' posts, you need to login.");
+      setShowLoginModal(true);
+    }
+  };
+
   const handleFollowersClick = () => {
-        if (username) {
-          // Navigate to feed page with filter parameter set to "following"
-          window.location.href = "/feed?filter=following";
-        } else {
-          setLoginMessage("In order to see your followers' posts, you need to login.");
-          setShowLoginModal(true);
-        }
-      };
+    if (username) {
+      // Navigate to feed page with filter parameter set to "following"
+      window.location.href = "/?filter=following";
+    } else {
+      setLoginMessage("In order to see your followers' posts, you need to login.");
+      setShowLoginModal(true);
+    }
+  };
 
   const handleProfileClick = () => {
     if (username) {
@@ -96,28 +109,41 @@ const Footer: React.FC = () => {
   return (
     <footer>
       <nav className="fixed bottom-0 left-0 w-full h-16 z-40 flex bg-[var(--primary-pink)] text-white border-t-8 border-[var(--uoc-yellow)]">
-      <Link href="/" className="flex-1 flex items-center justify-center p-4 hover:bg-[var(--bright-pink)] hover:cursor-pointer" >
-            <LuEarth className="text-3xl" />
-        </Link>
-        <div className="flex-1 flex items-center justify-center p-4 hover:bg-[var(--bright-pink)]">
+        
+        {/* See All Posts Button */}
+        <button className="flex-1 flex items-center justify-center p-4 hover:bg-[var(--bright-pink)] hover:cursor-pointer"
+                onClick={handleWorldClick}>
+          <LuEarth className="text-3xl" />
+        </button>
+
+        {/* University Posts Button */}
+        <button className="flex-1 flex items-center justify-center p-4 hover:bg-[var(--bright-pink)]"
+                onClick={handleAnnouncementsClick}>
           <LuSchool className="text-3xl" />
-        </div>
+        </button>
+
+        {/* New Post Button */}
         <div className="flex-1 flex items-center justify-center relative">
-          <div
-            className="bg-white text-[var(--primary-pink)] w-15 h-12 flex items-center justify-center 
+          <div className="bg-white text-[var(--primary-pink)] w-15 h-12 flex items-center justify-center 
                         rounded-md border-2 border-[var(--primary-pink)] absolute -top-4 cursor-pointer"
-            onClick={handlePlusClick}
-          >
+               onClick={handlePlusClick}>
             <FiPlus className="text-2xl" />
           </div>
         </div>
-        <div className="flex-1 flex items-center justify-center p-4 hover:bg-[var(--bright-pink)]" onClick={handleFollowersClick}>
+
+        {/* Friends Button */}
+        <button className="flex-1 flex items-center justify-center p-4 hover:bg-[var(--bright-pink)]"
+                onClick={handleFollowersClick}>
           <MdOutlinePeopleAlt className="text-3xl" />
-        </div>
-        <div className="flex-1 flex items-center justify-center p-4 hover:bg-[var(--bright-pink)] hover:cursor-pointer" onClick={handleProfileClick}>
+        </button>
+
+        {/* Profile Button */}
+        <button className="flex-1 flex items-center justify-center p-4 hover:bg-[var(--bright-pink)] hover:cursor-pointer"
+                onClick={handleProfileClick}>
           <MdOutlinePersonOutline className="text-3xl" />
-        </div>
+        </button>
       </nav>
+
       {showPostModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-[rgba(0,0,0,0.5)] z-50">
           <div className="bg-white rounded-xl shadow-2xl max-w-md w-full mx-auto max-h-[90vh] flex flex-col">
