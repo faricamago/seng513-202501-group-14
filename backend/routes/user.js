@@ -24,5 +24,7 @@ router.post('/uploadProfilePicture', upload.single('profilePic'), userController
 
 router.get('/profile', userController.getUserProfile);
 
+router.put('/updateBio', userController.updateBio);
+
 
 module.exports = router;

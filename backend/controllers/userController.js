@@ -3,12 +3,16 @@ const User = require('../models/User');
 const path = require('path');
 const fs = require('fs');
 
-// Register a new user
+// controllers/userController.js
 exports.registerUser = async (req, res) => {
   try {
-    // Validate that the email ends with @ucalgary.ca
+    // Validate the email
     if (!req.body.email.endsWith('@ucalgary.ca')) {
       return res.status(400).json({ error: 'Email must be a valid UCalgary email address' });
+    }
+    // Ensure the bio is never empty by setting default text if not provided or blank
+    if (!req.body.bio || req.body.bio.trim() === "") {
+      req.body.bio = "This is my bio. Edit to update your profile.";
     }
     const newUser = new User(req.body);
     await newUser.save();
@@ -17,6 +21,7 @@ exports.registerUser = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
 
 // User login endpoint
 exports.loginUser = async (req, res) => {
@@ -149,6 +154,24 @@ exports.getUserProfile = async (req, res) => {
     // Return user data; optionally remove sensitive fields like password.
     const { password, ...userData } = user.toObject();
     res.status(200).json(userData);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+
+exports.updateBio = async (req, res) => {
+  try {
+    const { username, bio } = req.body;
+    if (!bio || bio.trim() === "") {
+      return res.status(400).json({ error: "Bio cannot be empty" });
+    }
+    const updatedUser = await User.findOneAndUpdate(
+      { username },
+      { bio },
+      { new: true }
+    );
+    res.status(200).json({ message: "Bio updated successfully", bio: updatedUser.bio });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

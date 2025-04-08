@@ -9,6 +9,8 @@ const Profile = () => {
   const [profileUsername, setProfileUsername] = useState("");
   const [profilePic, setProfilePic] = useState<string>("");
   const [bio, setBio] = useState("");
+  const [isEditingBio, setIsEditingBio] = useState(false);
+  const [newBio, setNewBio] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Set profile username from query or session storage
@@ -28,7 +30,6 @@ const Profile = () => {
             // Ensure the backslash is replaced with a forward slash.
             setProfilePic(data.photo.replace(/\\/g, '/'));
           }
-          // Optionally, also set the bio or other details:
           if(data.bio) {
             setBio(data.bio);
           }
@@ -75,8 +76,34 @@ const Profile = () => {
       });
       if (!res.ok) throw new Error("Profile picture upload failed");
       const data = await res.json();
-      // Update the profile picture with the newly returned photo link
       setProfilePic(data.photo.replace(/\\/g, '/'));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // Handlers for editing bio
+  const handleCancelBio = () => {
+    setNewBio(bio);
+    setIsEditingBio(false);
+  };
+
+  const handleSaveBio = async () => {
+    if (!newBio.trim()) {
+      alert("Bio cannot be empty.");
+      return;
+    }
+    try {
+      // This is a placeholder. You'd typically send a PUT/PATCH request to update the bio.
+      const res = await fetch("http://localhost:5000/api/users/updateBio", {
+        method: 'PUT',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: profileUsername, bio: newBio })
+      });
+      if (!res.ok) throw new Error("Failed to update bio");
+      // On success, update the displayed bio and exit edit mode.
+      setBio(newBio);
+      setIsEditingBio(false);
     } catch (err) {
       console.error(err);
     }
@@ -113,7 +140,6 @@ const Profile = () => {
     <div className="flex flex-col items-center min-h-screen bg-transparent p-4">
       <div className="relative inline-block">
         <img 
-          // Prepend "/" to the relative path to access the file
           src={profilePic ? `http://localhost:5000/${profilePic.replace(/\\/g, '/')}` : "/sample-profile/dino2.jpg"}
           alt="Profile" 
           className="w-32 h-32 rounded-full border-4 border-white shadow-lg"
@@ -138,7 +164,34 @@ const Profile = () => {
         )}
       </div>
       <h1 className="mt-4 text-2xl font-bold text-gray-800">{profileUsername}</h1>
-      {bio && <p className="text-gray-600 mt-2">{bio}</p>}
+      <div className="mt-2">
+        {loggedInUser === profileUsername ? (
+          isEditingBio ? (
+            <div>
+              <textarea
+                className="border p-2 w-full"
+                value={newBio}
+                onChange={(e) => setNewBio(e.target.value)}
+              />
+              <div className="flex justify-center space-x-4 p-4">
+                <button onClick={handleCancelBio} className="px-4 py-2 text-[var(--dark-color)] bg-gray-300 rounded hover:bg-gray-400 hover:cursor-pointer w-1/2">
+                  Cancel
+                </button>
+                <button onClick={handleSaveBio} className="px-4 py-2 bg-[var(--primary-pink)] text-white rounded hover:bg-[var(--bright-pink)] hover:cursor-pointer w-1/2">
+                  Save
+                </button>
+              </div>
+            </div>
+          ) : (
+            // Make the bio clickable so the user can edit it
+            <p className="text-gray-600 cursor-pointer" onClick={() => { setNewBio(bio); setIsEditingBio(true); }}>
+              {bio}
+            </p>
+          )
+        ) : (
+          <p className="text-gray-600">{bio}</p>
+        )}
+      </div>
       {loggedInUser && loggedInUser !== profileUsername && (
         <button 
           onClick={handleFollowToggle}
@@ -151,9 +204,9 @@ const Profile = () => {
           {followStatus}
         </button>
       )}
-      <p className="mt-2 mb-6 text-center text-gray-600 max-w-md">
+      {/* <p className="mt-2 mb-6 text-center text-gray-600 max-w-md">
         This is {profileUsername}'s profile page.
-      </p>
+      </p> */}
       {loggedInUser === profileUsername ? (
         <Feed className='w-full' filterBy="mine" />
       ) : (
