@@ -1,5 +1,6 @@
 // controllers/postController.js
 const path = require('path');
+const fs = require('fs');
 const Post = require('../models/Post');
 
 const createPost = async (req, res) => {
@@ -8,20 +9,14 @@ const createPost = async (req, res) => {
     let imagePaths = [];
 
     if (req.files && req.files.length > 0) {
-      // Convert each file's path to a relative path.
-      // Assuming your uploads folder is in your project root,
-      // you can use path.relative() to get the relative path.
       imagePaths = req.files.map(file => {
-        // Compute the relative path from your project root (process.cwd())
         const relativePath = path.relative(process.cwd(), file.path);
         return relativePath;
       });
     }
 
-    // Construct the post data including title and an array of image paths
     const postData = { title, content, username, images: imagePaths };
 
-    // Save the post document to MongoDB
     const post = await Post.create(postData);
 
     res.status(201).json({
@@ -43,7 +38,6 @@ const getPosts = async (req, res) => {
 };
 
 const togglePostLike = async (req, res) => {
-
   console.log("togglePostLike called with body:", req.body);
 
   try {
@@ -53,17 +47,13 @@ const togglePostLike = async (req, res) => {
       return res.status(404).json({ error: 'Post not found' });
     }
 
-    // Check if the user already liked the post
     const alreadyLiked = post.likes.includes(loggedInUsername);
     if (alreadyLiked) {
-      // Remove the user from the likes array
       post.likes = post.likes.filter(user => user !== loggedInUsername);
     } else {
-      // Add the user to the likes array
       post.likes.push(loggedInUsername);
     }
 
-    // Save the updated post
     await post.save();
 
     res.status(200).json({
@@ -75,8 +65,97 @@ const togglePostLike = async (req, res) => {
   }
 };
 
+const updatePost = async (req, res) => {
+  try {
+    const { title, content, keptImages } = req.body;
+    let keptImagesArray = [];
+    if (keptImages) {
+      try {
+        keptImagesArray = JSON.parse(keptImages);
+      } catch (e) {
+        keptImagesArray = [];
+      }
+    }
+    let newImagePaths = [];
+    if (req.files && req.files.length > 0) {
+      newImagePaths = req.files.map(file => {
+        const relativePath = path.relative(process.cwd(), file.path);
+        return relativePath;
+      });
+    }
+
+    // Helper function to normalize paths (convert backslashes to forward slashes)
+    const normalizePath = (p) => p.replace(/\\/g, '/');
+
+    // Retrieve the original post from the database
+    const originalPost = await Post.findById(req.params.id);
+    if (!originalPost) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+    
+    // Normalize both the original image paths and the keptImages array.
+    const normalizedOriginal = originalPost.images.map(normalizePath);
+    const normalizedKept = keptImagesArray.map(normalizePath);
+
+    // Determine which images were removed by the user
+    const removedImages = normalizedOriginal.filter(imgPath => !normalizedKept.includes(imgPath));
+
+    // Delete only the removed images from the uploads folder.
+    removedImages.forEach(imagePath => {
+      const absolutePath = path.join(process.cwd(), imagePath);
+      if (fs.existsSync(absolutePath)) {
+        fs.unlinkSync(absolutePath);
+      }
+    });
+
+    // Combine the kept images and any new image paths.
+    const combinedImages = [...keptImagesArray, ...newImagePaths];
+
+    // Update the post record with the new data.
+    const post = await Post.findByIdAndUpdate(
+      req.params.id,
+      { title, content, images: combinedImages },
+      { new: true }
+    );
+    if (!post) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+    res.status(200).json({ message: "Post updated successfully", post });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+// Delete post and associated images from uploads folder
+const deletePost = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    if (!post) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+
+    if (post.images && post.images.length > 0) {
+      post.images.forEach(imagePath => {
+        const absolutePath = path.join(process.cwd(), imagePath);
+        if (fs.existsSync(absolutePath)) {
+          fs.unlinkSync(absolutePath);
+        }
+      });
+    }
+
+    await Post.findByIdAndDelete(req.params.id);
+
+    res.status(200).json({ message: "Post deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   getPosts,
   createPost,
-  togglePostLike
+  togglePostLike,
+  updatePost,  // New update endpoint
+  deletePost   // New delete endpoint
 };

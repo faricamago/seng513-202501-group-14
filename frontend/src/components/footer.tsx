@@ -28,7 +28,7 @@ const Footer: React.FC = () => {
     setShowPostModal(false);
   };
 
-  const handlePost = async (data: { title: string; content: string; images: File[] }) => {
+  const handlePost = async (data: { title: string; content: string; newImages?: File[]; keptImages?: string[] }) => {
     if (!data.title || !data.content) {
       alert("Please fill in the title and content.");
       return;
@@ -38,11 +38,14 @@ const Footer: React.FC = () => {
     formData.append("title", data.title);
     formData.append("content", data.content);
     formData.append("username", username); // Replace with the actual user id
-    // Append each image file (the field name 'images' must match the server-side expectation)
-    data.images.forEach((file) => {
-      formData.append("images", file);
-    });
-
+    
+    // Append new image files if they exist (for a new post, keptImages will be empty)
+    if (data.newImages && data.newImages.length > 0) {
+      data.newImages.forEach((file) => {
+        formData.append("images", file);
+      });
+    }
+  
     try {
       const response = await fetch("http://localhost:5000/api/posts", {
         method: "POST",
@@ -57,6 +60,7 @@ const Footer: React.FC = () => {
     }
     setShowPostModal(false);
   };
+  
 
   const handlePlusClick = () => {
     if (username) {
