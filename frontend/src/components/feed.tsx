@@ -1,5 +1,4 @@
-'use client'
-
+"use client";
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from 'next/navigation';
 import Post from "./post";
@@ -14,12 +13,18 @@ interface FeedProps {
 const Feed: React.FC<FeedProps> = ({ className, filterBy, filterByUser }) => {
   const [posts, setPosts] = useState<PostType[]>([]);
   const searchParams = useSearchParams();
+  // Check for both filter and search query parameters
   const filterQuery = searchParams.get("filter");
+  const searchQuery = searchParams.get("query") || "";
 
   useEffect(() => {
     async function fetchPosts() {
       try {
-        const res = await fetch('http://localhost:5000/api/posts');
+        // Append the query parameter if present
+        const url = searchQuery
+          ? `http://localhost:5000/api/posts?query=${encodeURIComponent(searchQuery)}`
+          : "http://localhost:5000/api/posts";
+        const res = await fetch(url);
         if (!res.ok) {
           throw new Error("Failed to fetch posts");
         }
@@ -32,7 +37,7 @@ const Feed: React.FC<FeedProps> = ({ className, filterBy, filterByUser }) => {
           return post;
         });
 
-        // Apply filtering based on prop or query parameter
+        // Apply additional filtering if needed (by following, mine, announcements, etc.)
         if (filterBy === "following" || filterQuery === "following") {
           const loggedInUsername = sessionStorage.getItem("username");
           if (loggedInUsername) {
@@ -42,22 +47,19 @@ const Feed: React.FC<FeedProps> = ({ className, filterBy, filterByUser }) => {
             processedPosts = processedPosts.filter(post => followingList.includes(post.username));
           }
         } else if (filterBy === "announcements") {
-
-          processedPosts = processedPosts.filter(post => {post.announcement === true});
-
+          processedPosts = processedPosts.filter(post => post.announcement === true);
         } else if (filterBy === "mine") {
           const loggedInUsername = sessionStorage.getItem("username");
           if (loggedInUsername) {
             processedPosts = processedPosts.filter(post => post.username === loggedInUsername);
           }
-        }else if (filterByUser) {
-             processedPosts = processedPosts.filter(post => post.username === filterByUser);
-           }
+        } else if (filterByUser) {
+          processedPosts = processedPosts.filter(post => post.username === filterByUser);
+        }
 
-        // Sort posts by createdAt date in descending order (latest first)
+        // Sort posts by createdAt date in descending order (newest first)
         const sortedPosts = processedPosts.sort(
-          (a: PostType, b: PostType) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          (a: PostType, b: PostType) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
         setPosts(sortedPosts);
       } catch (error) {
@@ -65,7 +67,7 @@ const Feed: React.FC<FeedProps> = ({ className, filterBy, filterByUser }) => {
       }
     }
     fetchPosts();
-  }, [filterBy,filterByUser,searchParams]);
+  }, [filterBy, filterByUser, searchQuery, filterQuery]);
 
   if (posts.length === 0) {
     if (filterBy === "following" || filterQuery === "following") {
@@ -81,16 +83,7 @@ const Feed: React.FC<FeedProps> = ({ className, filterBy, filterByUser }) => {
     <div className={`flex flex-col gap-4 ${className}`}>
       {posts.map((post) => (
         <div key={post._id} className="w-full">
-          <Post
-            _id={post._id}
-            username={post.username}
-            title={post.title}
-            content={post.content}
-            images={post.images}
-            announcement={post.announcement}
-            createdAt={post.createdAt}
-            likes={post.likes}
-          />
+          <Post {...post} />
         </div>
       ))}
     </div>

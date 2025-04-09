@@ -31,14 +31,23 @@ const createPost = async (req, res) => {
 
 const getPosts = async (req, res) => {
   try {
-    // Only fetch posts that are not reported:
-    const posts = await Post.find({ reported: false }).populate('username', 'name email');
+    // Build a filter for posts that are not reported.
+    let filter = { reported: false };
+    // If a search query is provided, search in both title and content.
+    const searchQuery = req.query.query;
+    if (searchQuery) {
+      filter.$or = [
+        { title: { $regex: searchQuery, $options: 'i' } },
+        { content: { $regex: searchQuery, $options: 'i' } }
+      ];
+    }
+    
+    const posts = await Post.find(filter).populate('username', 'name email');
     res.status(200).json(posts);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
-
 
 
 const togglePostLike = async (req, res) => {
