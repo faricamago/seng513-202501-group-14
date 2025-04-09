@@ -35,7 +35,7 @@ const Header = () => {
           and on small and larger screens (sm:) they change to a row.
         */}
         <div className="fixed top-0 left-0 w-full h-20 z-40 bg-[var(--primary-pink)] flex items-center px-4 border-b-8 border-[var(--uoc-yellow)]">
-          <Link href="/" className="w-2/20 flex items-center justify-center max-sm:w-2/16">
+          <Link href="/" className="w-2/20 flex items-center justify-center max-sm:w-2/16 hover:cursor-pointer">
             <img src="/assets/cuteredlogo.png" alt="Logo" className="w-20 h-[calc(100%-16px)]" />
           </Link>
           <div className="w-16/20 flex items-center justify-center pr-1 max-sm:w-10/16">
@@ -44,12 +44,12 @@ const Header = () => {
           {role === 'admin' && (
             <button
               onClick={() => router.push('/admin')}
-              className="w-1/20 flex items-center justify-center pr-1 max-sm:w-2/16"
+              className="w-1/20 flex items-center justify-center pr-1 max-sm:w-2/16 cursor-pointer"
             >
-              <MdAdminPanelSettings className="text-3xl text-white" />
+              <MdAdminPanelSettings className="text-3xl text-white hover:text-[var(--uoc-yellow)]" />
             </button>
           )}
-          {username && (<button onClick={() => setShowLogoutModal(true)} className="w-1/20 flex items-center justify-center max-sm:w-2/16"><LuLogOut className="text-3xl text-white" /></button>
+          {username && (<button onClick={() => setShowLogoutModal(true)} className="w-1/20 flex items-center justify-center max-sm:w-2/16 cursor-pointer"><LuLogOut className="text-3xl text-white hover:text-[var(--uoc-yellow)]" /></button>
           )}
 
         </div>

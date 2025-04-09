@@ -115,15 +115,15 @@ const Footer: React.FC = () => {
       <nav className="fixed bottom-0 left-0 w-full h-16 z-40 flex bg-[var(--primary-pink)] text-white border-t-8 border-[var(--uoc-yellow)]">
         
         {/* See All Posts Button */}
-        <button className="flex-1 flex items-center justify-center p-4 hover:bg-[var(--bright-pink)] hover:cursor-pointer"
+        <button className="flex-1 flex items-center justify-center p-4 hover:cursor-pointer"
                 onClick={handleWorldClick}>
-          <LuEarth className="text-3xl" />
+          <LuEarth className="text-3xl hover:text-[var(--uoc-yellow)]" />
         </button>
 
         {/* University Posts Button */}
-        <button className="flex-1 flex items-center justify-center p-4 hover:bg-[var(--bright-pink)]"
+        <button className="flex-1 flex items-center justify-center p-4 hover:cursor-pointer"
                 onClick={handleAnnouncementsClick}>
-          <LuSchool className="text-3xl" />
+          <LuSchool className="text-3xl hover:text-[var(--uoc-yellow)]" />
         </button>
 
         {/* New Post Button */}
@@ -131,20 +131,20 @@ const Footer: React.FC = () => {
           <div className="bg-white text-[var(--primary-pink)] w-15 h-12 flex items-center justify-center 
                         rounded-md border-2 border-[var(--primary-pink)] absolute -top-4 cursor-pointer"
                onClick={handlePlusClick}>
-            <FiPlus className="text-2xl" />
+            <FiPlus className="text-2xl hover:text-[var(--uoc-yellow)]" />
           </div>
         </div>
 
         {/* Friends Button */}
-        <button className="flex-1 flex items-center justify-center p-4 hover:bg-[var(--bright-pink)]"
+        <button className="flex-1 flex items-center justify-center p-4 hover:cursor-pointer"
                 onClick={handleFollowersClick}>
-          <MdOutlinePeopleAlt className="text-3xl" />
+          <MdOutlinePeopleAlt className="text-3xl hover:text-[var(--uoc-yellow)]" />
         </button>
 
         {/* Profile Button */}
-        <button className="flex-1 flex items-center justify-center p-4 hover:bg-[var(--bright-pink)] hover:cursor-pointer"
+        <button className="flex-1 flex items-center justify-center p-4 hover:cursor-pointer"
                 onClick={handleProfileClick}>
-          <MdOutlinePersonOutline className="text-3xl" />
+          <MdOutlinePersonOutline className="text-3xl hover:text-[var(--uoc-yellow)]" />
         </button>
       </nav>
 
