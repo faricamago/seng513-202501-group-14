@@ -28,14 +28,18 @@ const createPost = async (req, res) => {
   }
 };
 
+
 const getPosts = async (req, res) => {
   try {
-    const posts = await Post.find().populate('username', 'name email');
+    // Only fetch posts that are not reported:
+    const posts = await Post.find({ reported: false }).populate('username', 'name email');
     res.status(200).json(posts);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
+
+
 
 const togglePostLike = async (req, res) => {
   console.log("togglePostLike called with body:", req.body);
