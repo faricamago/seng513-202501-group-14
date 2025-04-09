@@ -1,6 +1,8 @@
 // models/Post.js
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+
+import mongoose from 'mongoose';
+
+const { Schema } = mongoose;
 
 const postSchema = new Schema({
   username: { type: String, required: true },
@@ -17,4 +19,4 @@ const postSchema = new Schema({
   announcement: { type: Boolean, default: false },
 }, { timestamps: true });
 
-module.exports = mongoose.model('Post', postSchema);
+export default mongoose.model('Post', postSchema);

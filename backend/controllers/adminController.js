@@ -1,5 +1,6 @@
 // controllers/adminController.js
-const Post = require("../models/Post");
+
+import Post from "../models/Post.js";
 
 // Fetch all flagged posts (those that have been reported)
 const getFlaggedPosts = async (req, res) => {
@@ -43,4 +44,4 @@ const deletePost = async (req, res) => {
   }
 };
 
-module.exports = { getFlaggedPosts, approvePost, deletePost };
+export { getFlaggedPosts, approvePost, deletePost };

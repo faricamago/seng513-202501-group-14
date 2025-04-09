@@ -1,9 +1,10 @@
 // routes/user.js
-const express = require('express');
-const router = express.Router();
-const userController = require('../controllers/userController');
-const upload = require('../controllers/upload');
 
+import express from 'express';
+import * as userController from '../controllers/userController.js';
+import { upload } from '../controllers/upload.js';
+
+const router = express.Router();
 
 // Register a new user
 router.post('/register', userController.registerUser);
@@ -27,4 +28,4 @@ router.get('/profile', userController.getUserProfile);
 router.put('/updateBio', userController.updateBio);
 
 
-module.exports = router;
+export default router;

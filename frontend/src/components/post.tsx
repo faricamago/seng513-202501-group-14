@@ -159,19 +159,10 @@ const Post: React.FC<PostType> = (props) => {
           {props.images && props.images.length > 0 && (
             <div className="flex flex-wrap gap-3 mt-3">
               {props.images.map((imgPath, index) => {
-                let src;
-                if (imgPath.startsWith("http")) {
-                  src = imgPath;
-                } else {
-                  const fixedPath = imgPath.replace(/\\/g, '/');
-                  const parts = fixedPath.split('/');
-                  const filename = parts[parts.length - 1];
-                  src = `http://localhost:5000/uploads/${props.username}/${filename}`;
-                }
                 return (
                   <ResponsiveImage
                     key={index}
-                    src={src}
+                    src={imgPath}
                     alt={`Post image ${index + 1}`}
                     className="rounded-lg w-64 h-auto"
                   />

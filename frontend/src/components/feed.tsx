@@ -32,7 +32,9 @@ const Feed: React.FC<FeedProps> = ({ className, filterBy, filterByUser }) => {
 
         let processedPosts = data.map((post: PostType) => {
           if (Array.isArray(post.images)) {
-            post.images = post.images.map((imgPath) => imgPath.replace(/\\/g, '/'));
+            post.images = post.images.map((imgPath) => 
+              typeof imgPath === "string" ? imgPath.replace(/\\/g, '/') : imgPath
+            );
           }
           return post;
         });

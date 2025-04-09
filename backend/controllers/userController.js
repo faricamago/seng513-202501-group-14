@@ -1,10 +1,10 @@
 // controllers/userController.js
-const User = require('../models/User');
-const path = require('path');
-const fs = require('fs');
+
+import { uploadImage } from './upload.js';
+import User from '../models/User.js';
 
 // controllers/userController.js
-exports.registerUser = async (req, res) => {
+export const registerUser = async (req, res) => {
   try {
     // Validate the email
     if (!req.body.email.endsWith('@ucalgary.ca')) {
@@ -24,7 +24,7 @@ exports.registerUser = async (req, res) => {
 
 
 // User login endpoint
-exports.loginUser = async (req, res) => {
+export const loginUser = async (req, res) => {
 try {
   const user = await User.findOne({ email: req.body.email });
   if (!user || user.password !== req.body.password) {
@@ -38,7 +38,7 @@ try {
 };
 
 // Follow a user
-exports.followUser = async (req, res) => {
+export const followUser = async (req, res) => {
   try {
     const { follower, following } = req.body;
     if (follower === following) {
@@ -62,7 +62,7 @@ exports.followUser = async (req, res) => {
 };
 
 // Get the list of users that a given user is following
-exports.getFollowing = async (req, res) => {
+export const getFollowing = async (req, res) => {
   try {
     const { username } = req.query;
     const user = await User.findOne({ username });
@@ -74,7 +74,7 @@ exports.getFollowing = async (req, res) => {
 };
 
 // Unfollow a user
-exports.unfollowUser = async (req, res) => {
+export const unfollowUser = async (req, res) => {
   console.log("unfollowUser called with body:", req.body);
     try {
       const { follower, following } = req.body;
@@ -97,39 +97,27 @@ exports.unfollowUser = async (req, res) => {
     }
   };
 
-  exports.uploadProfilePicture = async (req, res) => {
+  export const uploadProfilePicture = async (req, res) => {
     try {
       const username = req.body.username;
       if (!req.file) {
         return res.status(400).json({ error: 'No file uploaded.' });
       }
       
-      // Compute the new relative file path for the uploaded file.
-      const newFilePath = path.relative(process.cwd(), req.file.path);
-      
-      // Retrieve the user record to check for an existing profile picture.
-      const currentUser = await User.findOne({ username });
-      if (currentUser && currentUser.photo) {
-        // Compute the absolute path to the old picture using the database value.
-        const oldFilePath = path.resolve(process.cwd(), currentUser.photo);
-        console.log("Attempting to delete old file at:", oldFilePath);
-        
-        if (fs.existsSync(oldFilePath)) {
-          try {
-            await fs.promises.unlink(oldFilePath);
-            console.log("Old profile picture deleted successfully.");
-          } catch (unlinkError) {
-            console.error("Error deleting old file:", unlinkError);
-          }
-        } else {
-          console.log("Old file not found at:", oldFilePath);
-        }
+      // Upload the image to Firebase Storage.
+      const fileUrl = await uploadImage(req.file);
+      if (!fileUrl) {
+        return res.status(500).json({ error: 'Failed to upload file.' });
       }
-  
-      // Update the User document with the new profile picture's relative path.
+      
+      // Optionally, if you want to delete the old image from Firebase Storage,
+      // you'll need to implement that using the Firebase Admin SDK.
+      // For now, we'll simply update the user's profile picture URL.
+      
+      // Update the user's document with the new Firebase URL.
       const updatedUser = await User.findOneAndUpdate(
         { username },
-        { photo: newFilePath },
+        { photo: fileUrl },
         { new: true }
       );
       
@@ -144,7 +132,7 @@ exports.unfollowUser = async (req, res) => {
   };
 
 // Get user profile by username
-exports.getUserProfile = async (req, res) => {
+export const getUserProfile = async (req, res) => {
   try {
     const { username } = req.query;
     const user = await User.findOne({ username });
@@ -160,7 +148,7 @@ exports.getUserProfile = async (req, res) => {
 };
 
 
-exports.updateBio = async (req, res) => {
+export const updateBio = async (req, res) => {
   try {
     const { username, bio } = req.body;
     if (!bio || bio.trim() === "") {

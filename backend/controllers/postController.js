@@ -1,21 +1,25 @@
 // controllers/postController.js
-const path = require('path');
-const fs = require('fs');
-const Post = require('../models/Post');
+
+import Post from "../models/Post.js";
+import { uploadImage } from  './upload.js'
+import { getStoragePathFromUrl, deleteFileFromFirebase } from "../firebaseStorageHelper.js";
 
 const createPost = async (req, res) => {
   try {
     const { title, content, username } = req.body;
-    let imagePaths = [];
+    let imageUrls = [];
 
+    // If files are uploaded, upload each to Firebase Storage and collect the URLs.
     if (req.files && req.files.length > 0) {
-      imagePaths = req.files.map(file => {
-        const relativePath = path.relative(process.cwd(), file.path);
-        return relativePath;
+      const uploadPromises = req.files.map(async (file) => {
+        const url = await uploadImage(file);
+        return url;
       });
+      imageUrls = await Promise.all(uploadPromises);
     }
 
-    const postData = { title, content, username, images: imagePaths };
+    // Create the post using the Firebase image URLs.
+    const postData = { title, content, username, images: imageUrls };
 
     const post = await Post.create(postData);
 
@@ -27,7 +31,6 @@ const createPost = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
 
 const getPosts = async (req, res) => {
   try {
@@ -48,7 +51,6 @@ const getPosts = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
-
 
 const togglePostLike = async (req, res) => {
   console.log("togglePostLike called with body:", req.body);
@@ -89,49 +91,42 @@ const updatePost = async (req, res) => {
         keptImagesArray = [];
       }
     }
-    let newImagePaths = [];
+
+    let newImageUrls = [];
     if (req.files && req.files.length > 0) {
-      newImagePaths = req.files.map(file => {
-        const relativePath = path.relative(process.cwd(), file.path);
-        return relativePath;
+      const uploadPromises = req.files.map(async (file) => {
+        const url = await uploadImage(file);
+        return url;
       });
+      newImageUrls = await Promise.all(uploadPromises);
     }
 
-    // Helper function to normalize paths (convert backslashes to forward slashes)
-    const normalizePath = (p) => p.replace(/\\/g, '/');
-
-    // Retrieve the original post from the database
+    // Retrieve the original post
     const originalPost = await Post.findById(req.params.id);
     if (!originalPost) {
-      return res.status(404).json({ error: 'Post not found' });
+      return res.status(404).json({ error: "Post not found" });
     }
-    
-    // Normalize both the original image paths and the keptImages array.
-    const normalizedOriginal = originalPost.images.map(normalizePath);
-    const normalizedKept = keptImagesArray.map(normalizePath);
 
-    // Determine which images were removed by the user
-    const removedImages = normalizedOriginal.filter(imgPath => !normalizedKept.includes(imgPath));
+    // Find which images were removed (those in original but not in keptImagesArray)
+    const removedImages = originalPost.images.filter((imgUrl) => !keptImagesArray.includes(imgUrl));
 
-    // Delete only the removed images from the uploads folder.
-    removedImages.forEach(imagePath => {
-      const absolutePath = path.join(process.cwd(), imagePath);
-      if (fs.existsSync(absolutePath)) {
-        fs.unlinkSync(absolutePath);
-      }
-    });
+    // For each removed image, delete it from Firebase Storage.
+    for (const url of removedImages) {
+      const storagePath = getStoragePathFromUrl(url);
+      await deleteFileFromFirebase(storagePath);
+    }
 
-    // Combine the kept images and any new image paths.
-    const combinedImages = [...keptImagesArray, ...newImagePaths];
+    // Combine kept images and new uploads
+    const combinedImages = [...keptImagesArray, ...newImageUrls];
 
-    // Update the post record with the new data.
+    // Update the post.
     const post = await Post.findByIdAndUpdate(
       req.params.id,
       { title, content, images: combinedImages },
       { new: true }
     );
     if (!post) {
-      return res.status(404).json({ error: 'Post not found' });
+      return res.status(404).json({ error: "Post not found" });
     }
     res.status(200).json({ message: "Post updated successfully", post });
   } catch (error) {
@@ -139,31 +134,29 @@ const updatePost = async (req, res) => {
   }
 };
 
-
-// Delete post and associated images from uploads folder
 const deletePost = async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
     if (!post) {
-      return res.status(404).json({ error: 'Post not found' });
+      return res.status(404).json({ error: "Post not found" });
     }
 
+    // Delete each image from Firebase Storage.
     if (post.images && post.images.length > 0) {
-      post.images.forEach(imagePath => {
-        const absolutePath = path.join(process.cwd(), imagePath);
-        if (fs.existsSync(absolutePath)) {
-          fs.unlinkSync(absolutePath);
-        }
-      });
+      for (const url of post.images) {
+        const storagePath = getStoragePathFromUrl(url);
+        await deleteFileFromFirebase(storagePath);
+      }
     }
 
+    // Delete the post record.
     await Post.findByIdAndDelete(req.params.id);
-
     res.status(200).json({ message: "Post deleted successfully" });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
+
 
 const reportPost = async (req, res) => {
   try {
@@ -173,7 +166,7 @@ const reportPost = async (req, res) => {
       return res.status(404).json({ error: 'Post not found' });
     }
 
-    // Mark the post as reported
+    // Mark the post as reported so it's hidden from the regular feed
     post.reported = true;
     
     await post.save();
@@ -187,11 +180,11 @@ const reportPost = async (req, res) => {
   }
 };
 
-module.exports = {
+export  {
   getPosts,
   createPost,
   togglePostLike,
-  updatePost,  // New update endpoint
-  deletePost,   // New delete endpoint,
+  updatePost,
+  deletePost,
   reportPost
 };
