@@ -25,9 +25,12 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopol
 // Import and use routes
 const userRoutes = require('./routes/user');
 const postRoutes = require('./routes/post');
+const adminRoutes = require("./routes/admin");
 
 app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
+app.use("/api/admin", adminRoutes);
+
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 // Simple test route

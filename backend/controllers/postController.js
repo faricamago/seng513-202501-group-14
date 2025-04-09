@@ -28,14 +28,18 @@ const createPost = async (req, res) => {
   }
 };
 
+
 const getPosts = async (req, res) => {
   try {
-    const posts = await Post.find().populate('username', 'name email');
+    // Only fetch posts that are not reported:
+    const posts = await Post.find({ reported: false }).populate('username', 'name email');
     res.status(200).json(posts);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
+
+
 
 const togglePostLike = async (req, res) => {
   console.log("togglePostLike called with body:", req.body);
@@ -152,10 +156,33 @@ const deletePost = async (req, res) => {
   }
 };
 
+const reportPost = async (req, res) => {
+  try {
+    const { postId, reportedBy } = req.body;
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+
+    // Mark the post as reported
+    post.reported = true;
+    
+    await post.save();
+
+    res.status(200).json({
+      message: "Post reported successfully",
+      post
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   getPosts,
   createPost,
   togglePostLike,
   updatePost,  // New update endpoint
-  deletePost   // New delete endpoint
+  deletePost,   // New delete endpoint,
+  reportPost
 };

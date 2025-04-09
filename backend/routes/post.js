@@ -18,4 +18,8 @@ router.put('/:id', upload.array('images'), postController.updatePost);
 // Delete a post
 router.delete('/:id', postController.deletePost);
 
+// Report a post
+router.post('/report', postController.reportPost);
+
 module.exports = router;
+
