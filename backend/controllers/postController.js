@@ -179,6 +179,6 @@ module.exports = {
   createPost,
   togglePostLike,
   updatePost,  // New update endpoint
-  deletePost   // New delete endpoint,
+  deletePost,   // New delete endpoint,
   reportPost
 };

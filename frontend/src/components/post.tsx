@@ -49,7 +49,7 @@ const Post: React.FC<PostType> = (props) => {
       alert("Please log in to like a post.");
       return;
     }
-  
+
     try {
       const res = await fetch("http://localhost:5000/api/posts/like", {
         method: "POST",
@@ -59,11 +59,11 @@ const Post: React.FC<PostType> = (props) => {
           loggedInUsername,
         }),
       });
-  
+
       if (!res.ok) {
         throw new Error("Failed to like the post, got _id " + _id);
       }
-  
+
       setIsLiked(!isLiked);
       setLikeCount(isLiked ? likeCount - 1 : likeCount + 1);
       console.log("Post liked successfully!");
@@ -74,34 +74,34 @@ const Post: React.FC<PostType> = (props) => {
 
   // Edit handler: use FormData to send both keptImages and newImages
   // ... inside your handleEditPost function in post.tsx
-const handleEditPost = async (data: { title: string; content: string; newImages: File[]; keptImages: string[] }) => {
-  const formData = new FormData();
-  formData.append("title", data.title);
-  formData.append("content", data.content);
-  // Add the username (from session storage or however you store it)
-  const username = sessionStorage.getItem("username") || "default";
-  formData.append("username", username);
-  // Send kept images as a JSON string
-  formData.append("keptImages", JSON.stringify(data.keptImages));
-  data.newImages.forEach(file => {
-    formData.append("images", file);
-  });
-
-  try {
-    const res = await fetch(`http://localhost:5000/api/posts/${props._id}`, {
-      method: "PUT",
-      body: formData,
+  const handleEditPost = async (data: { title: string; content: string; newImages: File[]; keptImages: string[] }) => {
+    const formData = new FormData();
+    formData.append("title", data.title);
+    formData.append("content", data.content);
+    // Add the username (from session storage or however you store it)
+    const username = sessionStorage.getItem("username") || "default";
+    formData.append("username", username);
+    // Send kept images as a JSON string
+    formData.append("keptImages", JSON.stringify(data.keptImages));
+    data.newImages.forEach(file => {
+      formData.append("images", file);
     });
-    if (!res.ok) {
-      throw new Error("Failed to update post");
+
+    try {
+      const res = await fetch(`http://localhost:5000/api/posts/${props._id}`, {
+        method: "PUT",
+        body: formData,
+      });
+      if (!res.ok) {
+        throw new Error("Failed to update post");
+      }
+      console.log("Post updated successfully!");
+      setShowEditModal(false);
+      window.location.reload();
+    } catch (error) {
+      console.error(error);
     }
-    console.log("Post updated successfully!");
-    setShowEditModal(false);
-    window.location.reload();
-  } catch (error) {
-    console.error(error);
-  }
-};
+  };
 
   // Delete handler: sends DELETE request and relies on backend to remove images
   const handleDeletePost = async () => {
@@ -197,25 +197,35 @@ const handleEditPost = async (data: { title: string; content: string; newImages:
             <FaRegComment />
           </button>
           <span className="text-md font-bold">42</span>
+          {/* Report */}
+          <div className="flex items-center gap-2">
+            <button
+              className="flex items-center gap-1 px-3 py-1 hover:text-blue-500 transition transition"
+              onClick={() => reportPost(props._id)}
+            >
+              <FaRegFlag className="text-2xl" />
+              <span>Report</span>
+            </button>
           </div>
-          <div className="flex-grow" />
-          {loggedInUsername === props.username && (
-        <div className="flex items-end space-x-2 p-4">
-          <button 
-            className="hover:text-blue-500 transition text-2xl"
-            onClick={() => setShowEditModal(true)}
-          >
-            <MdOutlineModeEdit />
-          </button>
-          <button 
-            className="hover:text-blue-500 transition text-2xl"
-            onClick={() => setShowDeleteModal(true)}
-          >
-            <MdDeleteOutline />
-          </button>
         </div>
-      )}
-      </div>      
+        <div className="flex-grow" />
+        {loggedInUsername === props.username && (
+          <div className="flex items-end space-x-2 p-4">
+            <button
+              className="hover:text-blue-500 transition text-2xl"
+              onClick={() => setShowEditModal(true)}
+            >
+              <MdOutlineModeEdit />
+            </button>
+            <button
+              className="hover:text-blue-500 transition text-2xl"
+              onClick={() => setShowDeleteModal(true)}
+            >
+              <MdDeleteOutline />
+            </button>
+          </div>
+        )}
+      </div>
 
       {/* Edit Post Modal */}
       {showEditModal && (
@@ -225,7 +235,7 @@ const handleEditPost = async (data: { title: string; content: string; newImages:
               Edit Post
             </h2>
             <div className="flex-grow overflow-y-auto p-4">
-            <PostForm 
+              <PostForm
                 onCancel={() => setShowEditModal(false)}
                 onPost={handleEditPost}
                 isEdit={true}
@@ -248,14 +258,14 @@ const handleEditPost = async (data: { title: string; content: string; newImages:
               Are you sure you want to delete this post?
             </p>
             <div className="flex justify-center space-x-4">
-              <button 
-                onClick={() => setShowDeleteModal(false)} 
+              <button
+                onClick={() => setShowDeleteModal(false)}
                 className="px-4 py-2 bg-gray-300 text-[var(--dark-color)] rounded hover:bg-gray-400 transition"
               >
                 Cancel
               </button>
-              <button 
-                onClick={handleDeletePost} 
+              <button
+                onClick={handleDeletePost}
                 className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
               >
                 Delete
