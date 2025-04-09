@@ -2,32 +2,53 @@ import React, { useState, useRef } from "react";
 
 interface PostFormProps {
   onCancel: () => void;
-  onPost: (data: { title: string; content: string; images: File[] }) => void;
+  // onPost receives title, content, newImages (files added now) and keptImages (existing images that are not removed)
+  onPost: (data: { title: string; content: string; newImages: File[]; keptImages: string[] }) => void;
+  isEdit?: boolean;
+  initialTitle?: string;
+  initialContent?: string;
+  initialImages?: string[]; // Already uploaded image paths (or URLs)
 }
 
-const PostForm: React.FC<PostFormProps> = ({ onCancel, onPost }) => {
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [images, setImages] = useState<File[]>([]);
+const PostForm: React.FC<PostFormProps> = ({
+  onCancel,
+  onPost,
+  isEdit = false,
+  initialTitle = "",
+  initialContent = "",
+  initialImages = []
+}) => {
+  const [title, setTitle] = useState(initialTitle);
+  const [content, setContent] = useState(initialContent);
+  // State for files that have already been uploaded (existing images)
+  const [existingImages, setExistingImages] = useState<string[]>([...initialImages]);
+  // State for newly added images (File objects)
+  const [newImages, setNewImages] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setImages(prev => [...prev, ...Array.from(e.target.files!)]);
+    setNewImages(prev => [...prev, ...Array.from(e.target.files || [])]);
   };
-  
 
-  const removeImage = (index: number) => {
-    setImages(prev => prev.filter((_, i) => i !== index));
+  // Remove an image from existing (already uploaded) images
+  const removeExistingImage = (index: number) => {
+    setExistingImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  // Remove a newly added image
+  const removeNewImage = (index: number) => {
+    setNewImages(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onPost({ title, content, images });
-    window.location.href = "/profile";
+    onPost({ title, content, newImages, keptImages: existingImages });
   };
+  
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col">
+      {/* Title */}
       <div className="p-2">
         <label className="block text-gray-700 font-semibold mb-1">Title*</label>
         <input
@@ -38,6 +59,7 @@ const PostForm: React.FC<PostFormProps> = ({ onCancel, onPost }) => {
           className="w-full border border-gray-300 rounded p-2 mb-2 focus:outline-none"
         />
       </div>
+      {/* Content */}
       <div className="p-2">
         <label className="block text-gray-700 font-semibold mb-1">Content*</label>
         <textarea
@@ -47,9 +69,33 @@ const PostForm: React.FC<PostFormProps> = ({ onCancel, onPost }) => {
           className="w-full border border-gray-300 rounded p-2 mb-2 focus:outline-none h-40"
         />
       </div>
+      {/* Existing Images Section (visible in edit mode) */}
+      {isEdit && existingImages.length > 0 && (
+        <div className="p-2">
+          <p className="text-gray-700 font-semibold mb-1">Existing Images</p>
+          <div className="flex flex-wrap gap-3">
+            {existingImages.map((imgPath, index) => (
+              <div key={index} className="relative">
+                <img
+                  src={imgPath.startsWith("http") ? imgPath : `http://localhost:5000/${imgPath}`}
+                  alt={`Existing preview ${index}`}
+                  className="w-16 h-16 object-cover rounded"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeExistingImage(index)}
+                  className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
+                >
+                  x
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {/* New Images Section */}
       <div className="p-2">
         <label className="block text-gray-700 font-semibold mb-1">Images</label>
-        {/* Custom button to trigger file selection */}
         <button
           type="button"
           onClick={() => fileInputRef.current && fileInputRef.current.click()}
@@ -66,22 +112,21 @@ const PostForm: React.FC<PostFormProps> = ({ onCancel, onPost }) => {
           className="hidden"
         />
         <div className="mt-2">
-          {images.length === 0 ? (
-            <span>No files chosen</span>
+          {newImages.length === 0 ? (
+            <span>No new files chosen</span>
           ) : (
-            <div className="space-y-2">
-              {images.map((file, index) => (
-                <div key={index} className="flex items-center space-x-2">
+            <div className="flex flex-wrap gap-3">
+              {newImages.map((file, index) => (
+                <div key={index} className="relative">
                   <img
                     src={URL.createObjectURL(file)}
-                    alt={`Preview ${index}`}
+                    alt={`New preview ${index}`}
                     className="w-16 h-16 object-cover rounded"
                   />
-                  <span>{file.name}</span>
                   <button
                     type="button"
-                    onClick={() => removeImage(index)}
-                    className="bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:cursor-pointer"
+                    onClick={() => removeNewImage(index)}
+                    className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
                   >
                     x
                   </button>
@@ -91,6 +136,7 @@ const PostForm: React.FC<PostFormProps> = ({ onCancel, onPost }) => {
           )}
         </div>
       </div>
+      {/* Form Buttons */}
       <div className="flex justify-center space-x-4 p-4">
         <button
           type="button"
@@ -103,7 +149,7 @@ const PostForm: React.FC<PostFormProps> = ({ onCancel, onPost }) => {
           type="submit"
           className="px-4 py-2 bg-[var(--primary-pink)] text-white rounded hover:bg-[var(--bright-pink)] hover:cursor-pointer w-1/4"
         >
-          Post
+          {isEdit ? "Save" : "Post"}
         </button>
       </div>
     </form>

@@ -1,18 +1,44 @@
 "use client";
-import React, { useState, useEffect } from 'react';
-import Feed from '@/components/feed'
+import React, { useState, useEffect, useRef } from 'react';
+import Feed from '@/components/feed';
 import { useSearchParams } from 'next/navigation';
+import { MdOutlineModeEdit } from "react-icons/md";
 
 const Profile = () => {
   const searchParams = useSearchParams();
-const [profileUsername, setProfileUsername] = useState("");
-useEffect(() => {
-  const queryUsername = searchParams.get("username");
-  // Check if window is defined before accessing sessionStorage
-  const storedUsername = typeof window !== "undefined" ? sessionStorage.getItem("username") : "";
-  setProfileUsername(queryUsername || storedUsername || "");
-}, [searchParams]);
+  const [profileUsername, setProfileUsername] = useState("");
+  const [profilePic, setProfilePic] = useState<string>("");
+  const [bio, setBio] = useState("");
+  const [isEditingBio, setIsEditingBio] = useState(false);
+  const [newBio, setNewBio] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Set profile username from query or session storage
+  useEffect(() => {
+    const queryUsername = searchParams.get("username");
+    const storedUsername = typeof window !== "undefined" ? sessionStorage.getItem("username") : "";
+    setProfileUsername(queryUsername || storedUsername || "");
+  }, [searchParams]);
+
+  // Fetch profile data from the backend
+  useEffect(() => {
+    if (profileUsername) {
+      fetch(`http://localhost:5000/api/users/profile?username=${profileUsername}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.photo) {
+            // Ensure the backslash is replaced with a forward slash.
+            setProfilePic(data.photo.replace(/\\/g, '/'));
+          }
+          if(data.bio) {
+            setBio(data.bio);
+          }
+        })
+        .catch(err => console.error("Error fetching profile:", err));
+    }
+  }, [profileUsername]);
+
+  // Following functionalities retained from your existing code...
   const [loggedInUser, setLoggedInUser] = useState("");
   const [isFollowing, setIsFollowing] = useState(false);
   const [followStatus, setFollowStatus] = useState("");
@@ -21,7 +47,6 @@ useEffect(() => {
     const storedUsername = sessionStorage.getItem('username');
     if (storedUsername) {
       setLoggedInUser(storedUsername);
-      // Fetch following list for logged-in user to set follow status
       fetch(`http://localhost:5000/api/users/following?username=${storedUsername}`)
         .then(res => res.json())
         .then((followingList: string[]) => {
@@ -37,31 +62,69 @@ useEffect(() => {
     }
   }, [profileUsername]);
 
+  const handleProfilePicChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.files || event.target.files.length === 0) return;
+    const file = event.target.files[0];
+    const formData = new FormData();
+    formData.append('username', loggedInUser || profileUsername);
+    formData.append('profilePic', file);
+
+    try {
+      const res = await fetch("http://localhost:5000/api/users/uploadProfilePicture", {
+        method: 'POST',
+        body: formData,
+      });
+      if (!res.ok) throw new Error("Profile picture upload failed");
+      const data = await res.json();
+      setProfilePic(data.photo.replace(/\\/g, '/'));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // Handlers for editing bio
+  const handleCancelBio = () => {
+    setNewBio(bio);
+    setIsEditingBio(false);
+  };
+
+  const handleSaveBio = async () => {
+    if (!newBio.trim()) {
+      alert("Bio cannot be empty.");
+      return;
+    }
+    try {
+      // This is a placeholder. You'd typically send a PUT/PATCH request to update the bio.
+      const res = await fetch("http://localhost:5000/api/users/updateBio", {
+        method: 'PUT',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: profileUsername, bio: newBio })
+      });
+      if (!res.ok) throw new Error("Failed to update bio");
+      // On success, update the displayed bio and exit edit mode.
+      setBio(newBio);
+      setIsEditingBio(false);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const handleFollowToggle = async () => {
-    console.log("Unfollow payload:", { follower: loggedInUser, following: profileUsername });
     try {
       if (isFollowing) {
-        // Call unfollow endpoint
         const res = await fetch("http://localhost:5000/api/users/unfollow", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            follower: loggedInUser,
-            following: profileUsername
-          })
+          body: JSON.stringify({ follower: loggedInUser, following: profileUsername })
         });
         if (!res.ok) throw new Error("Failed to unfollow user");
         setIsFollowing(false);
         setFollowStatus("Follow");
       } else {
-        // Call follow endpoint
         const res = await fetch("http://localhost:5000/api/users/follow", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            follower: loggedInUser,
-            following: profileUsername
-          })
+          body: JSON.stringify({ follower: loggedInUser, following: profileUsername })
         });
         if (!res.ok) throw new Error("Failed to follow user");
         setIsFollowing(true);
@@ -75,12 +138,60 @@ useEffect(() => {
 
   return (
     <div className="flex flex-col items-center min-h-screen bg-transparent p-4">
-      <img 
-        src="/sample-profile/dino1.jpg" 
-        alt="Profile" 
-        className="w-32 h-32 rounded-full border-4 border-white shadow-lg"
-      />
+      <div className="relative inline-block">
+        <img 
+          src={profilePic ? `http://localhost:5000/${profilePic.replace(/\\/g, '/')}` : "/sample-profile/dino2.jpg"}
+          alt="Profile" 
+          className="w-32 h-32 rounded-full border-4 border-white shadow-lg"
+        />
+        {loggedInUser === profileUsername && (
+          <>
+            <button 
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="absolute top-0 right-0 bg-[var(--primary-pink)] rounded-full p-1 cursor-pointer"
+            >
+              <span className="text-white text-xs"><MdOutlineModeEdit /></span>
+            </button>
+            <input 
+              type="file"
+              accept="image/*"
+              ref={fileInputRef}
+              className="hidden"
+              onChange={handleProfilePicChange}
+            />
+          </>
+        )}
+      </div>
       <h1 className="mt-4 text-2xl font-bold text-gray-800">{profileUsername}</h1>
+      <div className="mt-2">
+        {loggedInUser === profileUsername ? (
+          isEditingBio ? (
+            <div>
+              <textarea
+                className="border p-2 w-full"
+                value={newBio}
+                onChange={(e) => setNewBio(e.target.value)}
+              />
+              <div className="flex justify-center space-x-4 p-4">
+                <button onClick={handleCancelBio} className="px-4 py-2 text-[var(--dark-color)] bg-gray-300 rounded hover:bg-gray-400 hover:cursor-pointer w-1/2">
+                  Cancel
+                </button>
+                <button onClick={handleSaveBio} className="px-4 py-2 bg-[var(--primary-pink)] text-white rounded hover:bg-[var(--bright-pink)] hover:cursor-pointer w-1/2">
+                  Save
+                </button>
+              </div>
+            </div>
+          ) : (
+            // Make the bio clickable so the user can edit it
+            <p className="text-gray-600 cursor-pointer" onClick={() => { setNewBio(bio); setIsEditingBio(true); }}>
+              {bio}
+            </p>
+          )
+        ) : (
+          <p className="text-gray-600">{bio}</p>
+        )}
+      </div>
       {loggedInUser && loggedInUser !== profileUsername && (
         <button 
           onClick={handleFollowToggle}
@@ -93,10 +204,9 @@ useEffect(() => {
           {followStatus}
         </button>
       )}
-      <p className="mt-2 mb-6 text-center text-gray-600 max-w-md">
+      {/* <p className="mt-2 mb-6 text-center text-gray-600 max-w-md">
         This is {profileUsername}'s profile page.
-      </p>
-      {/* If the logged in user is viewing their own profile, pass filterBy="mine" */}
+      </p> */}
       {loggedInUser === profileUsername ? (
         <Feed className='w-full' filterBy="mine" />
       ) : (

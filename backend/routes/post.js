@@ -1,4 +1,3 @@
-// routes/post.js
 const express = require('express');
 const router = express.Router();
 const postController = require('../controllers/postController');
@@ -10,8 +9,14 @@ router.get('/', postController.getPosts);
 // Create a new post
 router.post('/', upload.array('images'), postController.createPost);
 
-// Toggle post like
+// Like a post
 router.post('/like', postController.togglePostLike);
+
+// Update a post (edit): use the same upload middleware
+router.put('/:id', upload.array('images'), postController.updatePost);
+
+// Delete a post
+router.delete('/:id', postController.deletePost);
 
 // Report a post
 router.post('/report', postController.reportPost);

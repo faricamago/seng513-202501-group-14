@@ -2,6 +2,8 @@
 const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/userController');
+const upload = require('../controllers/upload');
+
 
 // Register a new user
 router.post('/register', userController.registerUser);
@@ -17,5 +19,12 @@ router.get('/following', userController.getFollowing);
 
 // Unfollow a user
 router.post('/unfollow', userController.unfollowUser);
+
+router.post('/uploadProfilePicture', upload.single('profilePic'), userController.uploadProfilePicture);
+
+router.get('/profile', userController.getUserProfile);
+
+router.put('/updateBio', userController.updateBio);
+
 
 module.exports = router;
