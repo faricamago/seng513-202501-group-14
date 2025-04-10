@@ -66,7 +66,7 @@ const Footer: React.FC = () => {
     if (username) {
       setShowPostModal(true);
     } else {
-      setLoginMessage("In order to add a post you need to login.");
+      setLoginMessage("Login to add a post");
       setShowLoginModal(true);
     }
   };
@@ -79,7 +79,7 @@ const Footer: React.FC = () => {
     if (username) {
       window.location.href = "/?filter=announcements";
     } else {
-      setLoginMessage("In order to see your followers' posts, you need to login.");
+      setLoginMessage("Login to see posts from followers");
       setShowLoginModal(true);
     }
   };
@@ -89,7 +89,7 @@ const Footer: React.FC = () => {
       // Navigate to feed page with filter parameter set to "following"
       window.location.href = "/?filter=following";
     } else {
-      setLoginMessage("In order to see your followers' posts, you need to login.");
+      setLoginMessage("Login to see posts from UofC");
       setShowLoginModal(true);
     }
   };
@@ -98,7 +98,7 @@ const Footer: React.FC = () => {
     if (username) {
       window.location.href = "/profile";
     } else {
-      setLoginMessage("In order to see your profile, you need to login.");
+      setLoginMessage("Login to see your profile");
       setShowLoginModal(true);
     }
   };
