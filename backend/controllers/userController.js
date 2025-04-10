@@ -2,6 +2,7 @@
 
 import { uploadImage } from './upload.js';
 import User from '../models/User.js';
+import { getStoragePathFromUrl, deleteFileFromFirebase } from "../firebaseStorageHelper.js";
 
 // controllers/userController.js
 export const registerUser = async (req, res) => {
@@ -101,29 +102,41 @@ export const unfollowUser = async (req, res) => {
     try {
       const username = req.body.username;
       if (!req.file) {
-        return res.status(400).json({ error: 'No file uploaded.' });
+        return res.status(400).json({ error: "No file uploaded." });
       }
-      
-      // Upload the image to Firebase Storage.
+  
+      // Find current user to get the old photo URL.
+      const currentUser = await User.findOne({ username });
+      const oldPhotoUrl = currentUser ? currentUser.photo : null;
+  
+      // Upload the new profile picture to Firebase Storage.
       const fileUrl = await uploadImage(req.file);
       if (!fileUrl) {
-        return res.status(500).json({ error: 'Failed to upload file.' });
+        return res.status(500).json({ error: "Failed to upload file." });
       }
-      
-      // Optionally, if you want to delete the old image from Firebase Storage,
-      // you'll need to implement that using the Firebase Admin SDK.
-      // For now, we'll simply update the user's profile picture URL.
-      
-      // Update the user's document with the new Firebase URL.
+  
+      // If there is an old photo and it's a Firebase URL different from the new one, delete the old file.
+      if (
+        oldPhotoUrl &&
+        oldPhotoUrl.startsWith("https://") &&
+        oldPhotoUrl !== fileUrl
+      ) {
+        const storagePath = getStoragePathFromUrl(oldPhotoUrl);
+        if (storagePath) {
+          await deleteFileFromFirebase(storagePath);
+        }
+      }
+  
+      // Update the user's document with the new photo URL.
       const updatedUser = await User.findOneAndUpdate(
         { username },
         { photo: fileUrl },
         { new: true }
       );
-      
-      return res.status(200).json({ 
-        message: 'Profile picture updated successfully', 
-        photo: updatedUser.photo 
+  
+      return res.status(200).json({
+        message: "Profile picture updated successfully",
+        photo: updatedUser.photo,
       });
     } catch (err) {
       console.error("Error in uploadProfilePicture:", err);
