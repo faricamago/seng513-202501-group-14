@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import { Metadata } from 'next';
 import Profile from './profile'
 
@@ -9,7 +9,9 @@ export const metadata: Metadata = {
 
 const Page = () => {
   return (
-    <Profile/>
+    <Suspense fallback={<div className='flex justify-center items-center h-screen'>Loading...</div>}>
+      <Profile/>
+    </Suspense>
   )
 };
 
