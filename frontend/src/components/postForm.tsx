@@ -43,6 +43,7 @@ const PostForm: React.FC<PostFormProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onPost({ title, content, newImages, keptImages: existingImages });
+    window.location.reload();
   };
 
   return (
