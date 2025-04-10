@@ -2,9 +2,8 @@ import React, { useState, useEffect } from "react";
 import { GiDinosaurRex } from "react-icons/gi";
 import ResponsiveImage from "./responsive-image";
 import Link from "next/link";
-import { BiLike } from "react-icons/bi";
-import { BiSolidLike } from "react-icons/bi";
-import { FaRegComment } from "react-icons/fa";
+import { BiLike, BiSolidLike } from "react-icons/bi";
+//import { FaRegComment } from "react-icons/fa";
 import PostForm from "./postForm";
 import { MdOutlineModeEdit } from "react-icons/md";
 import { MdDeleteOutline } from "react-icons/md";
@@ -20,19 +19,23 @@ export interface PostType {
   createdAt: Date;
   likes: string[];
   className?: string;
+  // Admin-specific props:
+  adminView?: boolean;
+  onApprove?: (postId: string) => void;
+  onDelete?: (postId: string) => void;
 }
 
 const Post: React.FC<PostType> = (props) => {
-   // State for author's profile picture
-   const [authorPhoto, setAuthorPhoto] = useState<string>("");
-  const [isLiked, setIsLiked] = useState(false);
+  // State for author's profile picture
+  const [authorPhoto, setAuthorPhoto] = useState<string>("");
   const loggedInUsername = sessionStorage.getItem("username");
+  const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(props.likes ? props.likes.length : 0);
 
-  // States for modals
+  // States for modals (edit, delete, report)
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [showReportConfirm, setshowReportConfirm] = useState(false);
+  const [showReportConfirm, setShowReportConfirm] = useState(false);
 
   useEffect(() => {
     if (loggedInUsername && props.likes) {
@@ -40,10 +43,13 @@ const Post: React.FC<PostType> = (props) => {
     }
   }, [loggedInUsername, props.likes]);
 
+  // Fetch author's profile photo
   useEffect(() => {
     async function fetchAuthorPhoto() {
       try {
-        const res = await fetch(`http://localhost:5000/api/users/profile?username=${props.username}`);
+        const res = await fetch(
+          `http://localhost:5000/api/users/profile?username=${props.username}`
+        );
         if (res.ok) {
           const data = await res.json();
           if (data.photo) {
@@ -62,7 +68,6 @@ const Post: React.FC<PostType> = (props) => {
       alert("Please log in to like a post.");
       return;
     }
-
     try {
       const res = await fetch("http://localhost:5000/api/posts/like", {
         method: "POST",
@@ -72,11 +77,9 @@ const Post: React.FC<PostType> = (props) => {
           loggedInUsername,
         }),
       });
-
       if (!res.ok) {
-        throw new Error("Failed to like the post, got _id " + _id);
+        throw new Error("Failed to like the post");
       }
-
       setIsLiked(!isLiked);
       setLikeCount(isLiked ? likeCount - 1 : likeCount + 1);
       console.log("Post liked successfully!");
@@ -85,21 +88,16 @@ const Post: React.FC<PostType> = (props) => {
     }
   };
 
-  // Edit handler: use FormData to send both keptImages and newImages
-  // ... inside your handleEditPost function in post.tsx
   const handleEditPost = async (data: { title: string; content: string; newImages: File[]; keptImages: string[] }) => {
     const formData = new FormData();
     formData.append("title", data.title);
     formData.append("content", data.content);
-    // Add the username (from session storage or however you store it)
     const username = sessionStorage.getItem("username") || "default";
     formData.append("username", username);
-    // Send kept images as a JSON string
     formData.append("keptImages", JSON.stringify(data.keptImages));
     data.newImages.forEach(file => {
       formData.append("images", file);
     });
-
     try {
       const res = await fetch(`http://localhost:5000/api/posts/${props._id}`, {
         method: "PUT",
@@ -116,7 +114,6 @@ const Post: React.FC<PostType> = (props) => {
     }
   };
 
-  // Delete handler: sends DELETE request and relies on backend to remove images
   const handleDeletePost = async () => {
     try {
       const res = await fetch(`http://localhost:5000/api/posts/${props._id}`, {
@@ -132,6 +129,7 @@ const Post: React.FC<PostType> = (props) => {
       console.error(error);
     }
   };
+
   const reportPost = async (postId: string) => {
     const loggedInUsername = sessionStorage.getItem("username");
     if (!loggedInUsername) {
@@ -142,37 +140,86 @@ const Post: React.FC<PostType> = (props) => {
       const res = await fetch("http://localhost:5000/api/posts/report", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          postId,
-          reportedBy: loggedInUsername,
-        }),
+        body: JSON.stringify({ postId, reportedBy: loggedInUsername }),
       });
       if (!res.ok) {
         throw new Error("Failed to report the post");
       }
-      //alert("Post reported successfully");
       console.log("Post reported successfully!");
-      setshowReportConfirm(false);
-      //reload page
+      setShowReportConfirm(false);
       window.location.reload();
     } catch (error) {
       console.error("Error reporting post:", error);
     }
   };
 
+  // Render controls based on adminView prop.
+  const renderControls = () => {
+    if (props.adminView === true) {
+      return (
+        <div className="flex items-center gap-2">
+          <button
+            className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition"
+            onClick={() => props.onApprove && props.onApprove(props._id)}
+          >
+            Approve
+          </button>
+          <button
+            className="bg-[var(--primary-pink)] text-white px-3 py-1 rounded hover:bg-red-600 transition"
+            onClick={() => props.onDelete && props.onDelete(props._id)}
+          >
+            Delete
+          </button>
+        </div>
+      );
+    } else {
+      return (
+        <>
+          <div className="flex items-center gap-2">
+            <button className="hover:text-blue-500 transition text-2xl" onClick={() => ToggleLikePost(props._id)}>
+              {isLiked ? <BiSolidLike /> : <BiLike />}
+            </button>
+            <span className="text-md font-bold">{likeCount}</span>
+          </div>
+          <div className="flex-grow" />
+          {loggedInUsername === props.username && (
+            <div className="flex items-end space-x-2 p-4">
+              <button className="hover:text-blue-500 transition text-2xl" onClick={() => setShowEditModal(true)}>
+                <MdOutlineModeEdit />
+              </button>
+              <button className="hover:text-blue-500 transition text-2xl" onClick={() => setShowDeleteModal(true)}>
+                <MdDeleteOutline />
+              </button>
+            </div>
+          )}
+          {loggedInUsername != props.username && (
+          <div className="flex items-center gap-2">
+            <button
+          className="flex items-center gap-1 px-3 py-1 hover:text-blue-500 transition"
+          onClick={() => setShowReportConfirm(true)}
+            >
+          <FaRegFlag className="text-lg sm:text-2xl" />
+          <span>Report</span>
+            </button>
+          </div>
+          )}
+        </>
+      );
+    }
+  };
 
   return (
     <div className={`border-2 border-[var(--uoc-yellow)] rounded-lg bg-white shadow-md ${props.className}`}>
       <div className="p-4 flex items-start gap-4">
         <div className="w-12 h-12 flex-shrink-0">
-        {authorPhoto ? (
+          {authorPhoto ? (
             <img
               src={authorPhoto.startsWith("http") ? authorPhoto : `http://localhost:5000/${authorPhoto}`}
               alt={props.username}
               className="w-full h-full rounded-full object-cover border-2 border-[var(--verylight-pink)]"
             />
           ) : (
-            <GiDinosaurRex className="w-full h-full text-[var(--verylight-pink)]" />
+            <GiDinosaurRex className="w-full h-full text-[var(--verylight-pink)] rounded-full" />
           )}
         </div>
         <div className="flex flex-col flex-grow">
@@ -183,91 +230,25 @@ const Post: React.FC<PostType> = (props) => {
           <p className="text-gray-700 mt-1 leading-relaxed">{props.content}</p>
           {props.images && props.images.length > 0 && (
             <div className="flex flex-wrap gap-3 mt-3">
-              {props.images.map((imgPath, index) => {
-                return (
-                  <ResponsiveImage
-                    key={index}
-                    src={imgPath}
-                    alt={`Post image ${index + 1}`}
-                    className="rounded-lg w-64 h-auto"
-                  />
-                );
-              })}
+              {props.images.map((imgPath, index) => (
+                <ResponsiveImage
+                  key={index}
+                  src={imgPath}
+                  alt={`Post image ${index + 1}`}
+                  className="rounded-lg w-64 h-auto"
+                />
+              ))}
             </div>
           )}
         </div>
       </div>
-      {/* Like and Comment Section */}
       <div className="bg-[var(--verylight-pink)] w-full flex items-center flex-wrap gap-2 sm:gap-4 p-4 mt-3 text-sm text-gray-500">
-        <div className="flex items-center gap-2">
-          <button
-        className="hover:text-blue-500 transition text-lg sm:text-xl"
-        onClick={() => ToggleLikePost(props._id)}
-          >
-        {isLiked ? <BiSolidLike /> : <BiLike />}
-          </button>
-          <span className="text-md font-bold">{likeCount}</span>
-        </div>
-        {/* <div className="flex items-center gap-2">
-          <button className="hover:text-blue-500 transition text-lg sm:text-2xl">
-        <FaRegComment />
-          </button>
-          <span className="text-md font-bold">42</span>
-        </div> */}
-        <div className="flex-grow" />
-        {loggedInUsername === props.username && (
-          <div className="flex items-center gap-2">
-        <button
-          className="hover:text-blue-500 transition text-lg sm:text-2xl"
-          onClick={() => setShowEditModal(true)}
-        >
-          <MdOutlineModeEdit />
-        </button>
-        <button
-          className="hover:text-blue-500 transition text-2xl"
-          onClick={() => setShowDeleteModal(true)}
-        >
-          <MdDeleteOutline />
-        </button>
-          </div>
-        )}
-        {loggedInUsername != props.username && (
-         <div className="flex items-center gap-2">
-          <button
-        className="flex items-center gap-1 px-3 py-1 hover:text-blue-500 transition"
-        onClick={() => setshowReportConfirm(true)}
-          >
-        <FaRegFlag className="text-lg sm:text-2xl" />
-        <span>Report</span>
-          </button>
-        </div>
-        )}
+        {renderControls()}
       </div>
-
-      {showReportConfirm && (
-        <div className="fixed inset-0 flex items-center justify-center bg-[rgba(0,0,0,0.5)] z-50">
-          <div className="bg-white p-8 rounded-xl shadow-2xl max-w-md mx-auto transform transition-all duration-300 hover:scale-105">
-            <h2 className="text-[var(--dark-color)] text-2xl font-bold text-center mb-4">Report Post</h2>
-            <p className="text-gray-700 text-center mb-6">Are you sure you want to report this post to the uni admin?</p>
-            <div className="flex justify-center space-x-4">
-              <button onClick={() => setshowReportConfirm(false)} className="px-4 py-2 bg-gray-300 text-[var(--dark-color)] rounded hover:bg-gray-400 transition">
-                Cancel
-              </button>
-              <button onClick={() => reportPost(props._id)} className="px-4 py-2 bg-[var(--primary-pink)] text-white rounded hover:bg-[var(--bright-pink)] transition">
-                Report
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Edit Post Modal */}
       {showEditModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-[rgba(0,0,0,0.5)] z-50">
           <div className="bg-white rounded-xl shadow-2xl max-w-md w-full mx-auto max-h-[90vh] flex flex-col">
-            <h2 className="text-2xl font-bold text-[var(--dark-color)] text-center mb-4 p-4">
-              Edit Post
-            </h2>
+            <h2 className="text-2xl font-bold text-[var(--dark-color)] text-center mb-4 p-4">Edit Post</h2>
             <div className="flex-grow overflow-y-auto p-4">
               <PostForm
                 onCancel={() => setShowEditModal(false)}
@@ -281,16 +262,11 @@ const Post: React.FC<PostType> = (props) => {
           </div>
         </div>
       )}
-
-
-      {/* Delete Confirmation Modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-[rgba(0,0,0,0.5)] z-50">
           <div className="bg-white p-8 rounded-xl shadow-2xl max-w-md mx-auto transform transition-all duration-300 hover:scale-105">
             <h2 className="text-[var(--dark-color)] text-2xl font-bold text-center mb-4">Confirm Delete</h2>
-            <p className="text-gray-700 text-center mb-6">
-              Are you sure you want to delete this post?
-            </p>
+            <p className="text-gray-700 text-center mb-6">Are you sure you want to delete this post?</p>
             <div className="flex justify-center space-x-4">
               <button
                 onClick={() => setShowDeleteModal(false)}
@@ -303,6 +279,22 @@ const Post: React.FC<PostType> = (props) => {
                 className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
               >
                 Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {showReportConfirm && (
+        <div className="fixed inset-0 flex items-center justify-center bg-[rgba(0,0,0,0.5)] z-50">
+          <div className="bg-white p-8 rounded-xl shadow-2xl max-w-md mx-auto transform transition-all duration-300 hover:scale-105">
+            <h2 className="text-[var(--dark-color)] text-2xl font-bold text-center mb-4">Report Post</h2>
+            <p className="text-gray-700 text-center mb-6">Are you sure you want to report this post to the uni admin?</p>
+            <div className="flex justify-center space-x-4">
+              <button onClick={() => setShowReportConfirm(false)} className="px-4 py-2 bg-gray-300 text-[var(--dark-color)] rounded hover:bg-gray-400 transition">
+                Cancel
+              </button>
+              <button onClick={() => reportPost(props._id)} className="px-4 py-2 bg-[var(--primary-pink)] text-white rounded hover:bg-[var(--bright-pink)] transition">
+                Report
               </button>
             </div>
           </div>
