@@ -7,7 +7,7 @@ interface PostFormProps {
   isEdit?: boolean;
   initialTitle?: string;
   initialContent?: string;
-  initialImages?: string[]; // Already uploaded image paths (or URLs)
+  initialImages?: string[]; // Already uploaded image URLs (from Firebase)
 }
 
 const PostForm: React.FC<PostFormProps> = ({
@@ -20,7 +20,7 @@ const PostForm: React.FC<PostFormProps> = ({
 }) => {
   const [title, setTitle] = useState(initialTitle);
   const [content, setContent] = useState(initialContent);
-  // State for files that have already been uploaded (existing images)
+  // State for images that have already been uploaded (Firebase URLs)
   const [existingImages, setExistingImages] = useState<string[]>([...initialImages]);
   // State for newly added images (File objects)
   const [newImages, setNewImages] = useState<File[]>([]);
@@ -44,7 +44,6 @@ const PostForm: React.FC<PostFormProps> = ({
     e.preventDefault();
     onPost({ title, content, newImages, keptImages: existingImages });
   };
-  
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col">
@@ -74,10 +73,10 @@ const PostForm: React.FC<PostFormProps> = ({
         <div className="p-2">
           <p className="text-gray-700 font-semibold mb-1">Existing Images</p>
           <div className="flex flex-wrap gap-3">
-            {existingImages.map((imgPath, index) => (
+            {existingImages.map((imgUrl, index) => (
               <div key={index} className="relative">
                 <img
-                  src={imgPath.startsWith("http") ? imgPath : `http://localhost:5000/${imgPath}`}
+                  src={imgUrl}  // Using the Firebase URL directly.
                   alt={`Existing preview ${index}`}
                   className="w-16 h-16 object-cover rounded"
                 />

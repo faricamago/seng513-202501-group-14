@@ -23,13 +23,8 @@ export interface PostType {
 }
 
 const Post: React.FC<PostType> = (props) => {
-  const normalizeToRelative = (url: string) => {
-    // If the image path starts with "http://localhost:5000/", strip that part out.
-    // Also convert backslashes to forward slashes, just in case.
-    return url
-      .replace(/^https?:\/\/[^/]+\//, '') // remove "http://localhost:5000/"
-      .replace(/\\/g, '/');               // convert backslashes to slashes
-  };
+   // State for author's profile picture
+   const [authorPhoto, setAuthorPhoto] = useState<string>("");
   const [isLiked, setIsLiked] = useState(false);
   const loggedInUsername = sessionStorage.getItem("username");
   const [likeCount, setLikeCount] = useState(props.likes ? props.likes.length : 0);
@@ -43,6 +38,23 @@ const Post: React.FC<PostType> = (props) => {
       setIsLiked(props.likes.includes(loggedInUsername));
     }
   }, [loggedInUsername, props.likes]);
+
+  useEffect(() => {
+    async function fetchAuthorPhoto() {
+      try {
+        const res = await fetch(`http://localhost:5000/api/users/profile?username=${props.username}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.photo) {
+            setAuthorPhoto(data.photo);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching author photo:", error);
+      }
+    }
+    fetchAuthorPhoto();
+  }, [props.username]);
 
   const ToggleLikePost = async (_id: string) => {
     if (!loggedInUsername) {
@@ -148,7 +160,15 @@ const Post: React.FC<PostType> = (props) => {
     <div className={`border-2 border-[var(--uoc-yellow)] rounded-lg bg-white shadow-md ${props.className}`}>
       <div className="p-4 flex items-start gap-4">
         <div className="w-12 h-12 flex-shrink-0">
-          <GiDinosaurRex className="w-full h-full text-gray-400" />
+        {authorPhoto ? (
+            <img
+              src={authorPhoto.startsWith("http") ? authorPhoto : `http://localhost:5000/${authorPhoto}`}
+              alt={props.username}
+              className="w-full h-full rounded-full object-cover border-2 border-[var(--verylight-pink)]"
+            />
+          ) : (
+            <GiDinosaurRex className="w-full h-full text-[var(--verylight-pink)]" />
+          )}
         </div>
         <div className="flex flex-col flex-grow">
           <Link href={`/profile?username=${props.username}`}>
@@ -159,19 +179,10 @@ const Post: React.FC<PostType> = (props) => {
           {props.images && props.images.length > 0 && (
             <div className="flex flex-wrap gap-3 mt-3">
               {props.images.map((imgPath, index) => {
-                let src;
-                if (imgPath.startsWith("http")) {
-                  src = imgPath;
-                } else {
-                  const fixedPath = imgPath.replace(/\\/g, '/');
-                  const parts = fixedPath.split('/');
-                  const filename = parts[parts.length - 1];
-                  src = `http://localhost:5000/uploads/${props.username}/${filename}`;
-                }
                 return (
                   <ResponsiveImage
                     key={index}
-                    src={src}
+                    src={imgPath}
                     alt={`Post image ${index + 1}`}
                     className="rounded-lg w-64 h-auto"
                   />

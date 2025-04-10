@@ -1,23 +1,34 @@
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
+// upload.js
 
-// Configure storage to create a folder per user (relative to the app root)
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    // Get the user id from the request body
-    const userId = req.body.username;
-    // Create a directory path such as "./uploads/<userId>"
-    const uploadPath = path.join(__dirname, '../uploads', userId);
-    fs.mkdirSync(uploadPath, { recursive: true });
-    cb(null, uploadPath);
-  },
-  filename: function (req, file, cb) {
-    // Create a unique filename using the current timestamp and original name
-    cb(null, `${Date.now()}-${file.originalname}`);
+// Use ES modules-style imports for Firebase Storage functions.
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { storage } from "../firebase-config.js";
+import multer from "multer";
+
+// Use multer's memory storage so that uploaded files are stored in memory as buffers.
+const upload = multer({ storage: multer.memoryStorage() });
+
+// Function to upload an image file to Firebase Storage.
+async function uploadImage(file) {
+  if (!file) return;
+
+  // Create a unique filename using the current timestamp and the original filename.
+  const fileName = `${Date.now()}-${file.originalname}`;
+  // Create a storage reference at a path like "uploads/<fileName>"
+  const firebaseStorageRef = ref(storage, `uploads/${fileName}`);
+
+  try {
+    // Because we're using memoryStorage, the file is in file.buffer.
+    await uploadBytes(firebaseStorageRef, file.buffer);
+    // Retrieve the download URL for the uploaded file.
+    const url = await getDownloadURL(firebaseStorageRef);
+    console.log("Uploaded file available at:", url);
+    return url;
+  } catch (error) {
+    console.error("Error uploading file:", error);
+    return null;
   }
-});
+}
 
-const upload = multer({ storage: storage });
+export { upload, uploadImage };
 
-module.exports = upload;

@@ -1,7 +1,8 @@
-const express = require('express');
+import express from 'express';
+import * as postController from '../controllers/postController.js';
+import { upload } from '../controllers/upload.js';
+
 const router = express.Router();
-const postController = require('../controllers/postController');
-const upload = require('../controllers/upload');
 
 // Retrieve all posts
 router.get('/', postController.getPosts);
@@ -21,5 +22,5 @@ router.delete('/:id', postController.deletePost);
 // Report a post
 router.post('/report', postController.reportPost);
 
-module.exports = router;
+export default router;
 

@@ -1,10 +1,10 @@
 // server.js
-const express = require('express');
-const mongoose = require('mongoose');
-const dotenv = require('dotenv');
-const cors = require("cors");
-const path = require('path');
-
+import express from 'express';
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -18,20 +18,25 @@ app.use(express.json());
 app.use(cors());
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose
+  .connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.error('MongoDB connection error:', err));
 
-// Import and use routes
-const userRoutes = require('./routes/user');
-const postRoutes = require('./routes/post');
-const adminRoutes = require("./routes/admin");
+// Import and use routes (make sure these files have the .js extension)
+import userRoutes from './routes/user.js';
+import postRoutes from './routes/post.js';
+import adminRoutes from './routes/admin.js';
 
 app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
-app.use("/api/admin", adminRoutes);
+app.use('/api/admin', adminRoutes);
 
-app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+// Compute __dirname for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Simple test route
 app.get('/', (req, res) => {

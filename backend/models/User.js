@@ -1,6 +1,8 @@
 // models/User.js
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+
+import mongoose from 'mongoose';
+
+const { Schema } = mongoose;
 
 const userSchema = new Schema({
   email: { type: String, required: true, unique: true },
@@ -15,4 +17,4 @@ const userSchema = new Schema({
   following: [{ type: String }]  // list of usernames this user is following
 }, { timestamps: true });
 
-module.exports = mongoose.model('User', userSchema);
+export default mongoose.model('User', userSchema);
