@@ -27,8 +27,7 @@ const Profile = () => {
         .then(res => res.json())
         .then(data => {
           if (data.photo) {
-            // Ensure the backslash is replaced with a forward slash.
-            setProfilePic(data.photo.replace(/\\/g, '/'));
+            setProfilePic(data.photo);
           }
           if(data.bio) {
             setBio(data.bio);
@@ -76,7 +75,7 @@ const Profile = () => {
       });
       if (!res.ok) throw new Error("Profile picture upload failed");
       const data = await res.json();
-      setProfilePic(data.photo.replace(/\\/g, '/'));
+      setProfilePic(data.photo);
     } catch (err) {
       console.error(err);
     }
@@ -140,7 +139,7 @@ const Profile = () => {
     <div className="flex flex-col items-center min-h-screen bg-transparent p-4">
       <div className="relative inline-block">
         <img 
-          src={profilePic ? `http://localhost:5000/${profilePic.replace(/\\/g, '/')}` : "/sample-profile/dino2.jpg"}
+          src={profilePic ? profilePic : "/sample-profile/dino2.jpg"}
           alt="Profile" 
           className="w-32 h-32 rounded-full border-4 border-white shadow-lg"
         />
