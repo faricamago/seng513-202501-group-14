@@ -79,7 +79,7 @@ const Footer: React.FC = () => {
     if (username) {
       window.location.href = "/?filter=announcements";
     } else {
-      setLoginMessage("Login to see posts from followers");
+      setLoginMessage("Login to posts from UofC");
       setShowLoginModal(true);
     }
   };
@@ -89,7 +89,7 @@ const Footer: React.FC = () => {
       // Navigate to feed page with filter parameter set to "following"
       window.location.href = "/?filter=following";
     } else {
-      setLoginMessage("Login to see posts from UofC");
+      setLoginMessage("Login to see see posts from followers");
       setShowLoginModal(true);
     }
   };
