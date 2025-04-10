@@ -163,7 +163,7 @@ const Profile = () => {
         )}
       </div>
       <h1 className="mt-4 text-2xl font-bold text-gray-800">{profileUsername}</h1>
-      <div className="mt-2">
+      <div className="mt-2 mb-4">
         {loggedInUser === profileUsername ? (
           isEditingBio ? (
             <div>
@@ -194,7 +194,7 @@ const Profile = () => {
       {loggedInUser && loggedInUser !== profileUsername && (
         <button 
           onClick={handleFollowToggle}
-          className={`px-4 py-2 rounded hover:cursor-pointer mt-2 border border-2 border-[var(--primary-pink)] ${
+          className={`px-4 py-2 mb-4 rounded hover:cursor-pointer mt-2 border border-2 border-[var(--primary-pink)] ${
             isFollowing 
               ? "bg-white text-red-500 hover:bg-red-100" 
               : "bg-[var(--primary-pink)] text-white hover:bg-[var(--bright-pink)]"
