@@ -32,6 +32,7 @@ const Post: React.FC<PostType> = (props) => {
   // States for modals
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showReportConfirm, setshowReportConfirm] = useState(false);
 
   useEffect(() => {
     if (loggedInUsername && props.likes) {
@@ -149,7 +150,11 @@ const Post: React.FC<PostType> = (props) => {
       if (!res.ok) {
         throw new Error("Failed to report the post");
       }
-      alert("Post reported successfully");
+      //alert("Post reported successfully");
+      console.log("Post reported successfully!");
+      setshowReportConfirm(false);
+      //reload page
+      window.location.reload();
     } catch (error) {
       console.error("Error reporting post:", error);
     }
@@ -203,21 +208,12 @@ const Post: React.FC<PostType> = (props) => {
           </button>
           <span className="text-md font-bold">{likeCount}</span>
         </div>
-        <div className="flex items-center gap-2">
+        {/* <div className="flex items-center gap-2">
           <button className="hover:text-blue-500 transition text-lg sm:text-2xl">
         <FaRegComment />
           </button>
           <span className="text-md font-bold">42</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-        className="flex items-center gap-1 px-3 py-1 hover:text-blue-500 transition"
-        onClick={() => reportPost(props._id)}
-          >
-        <FaRegFlag className="text-lg sm:text-2xl" />
-        <span>Report</span>
-          </button>
-        </div>
+        </div> */}
         <div className="flex-grow" />
         {loggedInUsername === props.username && (
           <div className="flex items-center gap-2">
@@ -235,7 +231,35 @@ const Post: React.FC<PostType> = (props) => {
         </button>
           </div>
         )}
+        {loggedInUsername != props.username && (
+         <div className="flex items-center gap-2">
+          <button
+        className="flex items-center gap-1 px-3 py-1 hover:text-blue-500 transition"
+        onClick={() => setshowReportConfirm(true)}
+          >
+        <FaRegFlag className="text-lg sm:text-2xl" />
+        <span>Report</span>
+          </button>
+        </div>
+        )}
       </div>
+
+      {showReportConfirm && (
+        <div className="fixed inset-0 flex items-center justify-center bg-[rgba(0,0,0,0.5)] z-50">
+          <div className="bg-white p-8 rounded-xl shadow-2xl max-w-md mx-auto transform transition-all duration-300 hover:scale-105">
+            <h2 className="text-[var(--dark-color)] text-2xl font-bold text-center mb-4">Report Post</h2>
+            <p className="text-gray-700 text-center mb-6">Are you sure you want to report this post to the uni admin?</p>
+            <div className="flex justify-center space-x-4">
+              <button onClick={() => setshowReportConfirm(false)} className="px-4 py-2 bg-gray-300 text-[var(--dark-color)] rounded hover:bg-gray-400 transition">
+                Cancel
+              </button>
+              <button onClick={() => reportPost(props._id)} className="px-4 py-2 bg-[var(--primary-pink)] text-white rounded hover:bg-[var(--bright-pink)] transition">
+                Report
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Edit Post Modal */}
       {showEditModal && (
