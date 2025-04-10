@@ -182,47 +182,46 @@ const Post: React.FC<PostType> = (props) => {
         </div>
       </div>
       {/* Like and Comment Section */}
-      <div className="bg-[var(--verylight-pink)] w-full flex gap-8 p-4 mt-3 text-sm text-gray-500">
-        <div className='flex items-center gap-2'>
+      <div className="bg-[var(--verylight-pink)] w-full flex items-center flex-wrap gap-2 sm:gap-4 p-4 mt-3 text-sm text-gray-500">
+        <div className="flex items-center gap-2">
           <button
-            className="hover:text-blue-500 transition text-2xl"
-            onClick={() => ToggleLikePost(props._id)}
+        className="hover:text-blue-500 transition text-lg sm:text-xl"
+        onClick={() => ToggleLikePost(props._id)}
           >
-            {isLiked ? <BiSolidLike /> : <BiLike />}
+        {isLiked ? <BiSolidLike /> : <BiLike />}
           </button>
           <span className="text-md font-bold">{likeCount}</span>
         </div>
-        <div className='flex items-center gap-2'>
-          <button className="hover:text-blue-500 transition text-2xl">
-            <FaRegComment />
+        <div className="flex items-center gap-2">
+          <button className="hover:text-blue-500 transition text-lg sm:text-2xl">
+        <FaRegComment />
           </button>
           <span className="text-md font-bold">42</span>
-          {/* Report */}
-          <div className="flex items-center gap-2">
-            <button
-              className="flex items-center gap-1 px-3 py-1 hover:text-blue-500 transition transition"
-              onClick={() => reportPost(props._id)}
-            >
-              <FaRegFlag className="text-2xl" />
-              <span>Report</span>
-            </button>
-          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+        className="flex items-center gap-1 px-3 py-1 hover:text-blue-500 transition"
+        onClick={() => reportPost(props._id)}
+          >
+        <FaRegFlag className="text-lg sm:text-2xl" />
+        <span>Report</span>
+          </button>
         </div>
         <div className="flex-grow" />
         {loggedInUsername === props.username && (
-          <div className="flex items-end space-x-2 p-4">
-            <button
-              className="hover:text-blue-500 transition text-2xl"
-              onClick={() => setShowEditModal(true)}
-            >
-              <MdOutlineModeEdit />
-            </button>
-            <button
-              className="hover:text-blue-500 transition text-2xl"
-              onClick={() => setShowDeleteModal(true)}
-            >
-              <MdDeleteOutline />
-            </button>
+          <div className="flex items-center gap-2">
+        <button
+          className="hover:text-blue-500 transition text-lg sm:text-2xl"
+          onClick={() => setShowEditModal(true)}
+        >
+          <MdOutlineModeEdit />
+        </button>
+        <button
+          className="hover:text-blue-500 transition text-2xl"
+          onClick={() => setShowDeleteModal(true)}
+        >
+          <MdDeleteOutline />
+        </button>
           </div>
         )}
       </div>
