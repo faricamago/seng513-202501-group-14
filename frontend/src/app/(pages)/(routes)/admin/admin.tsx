@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { PostType } from "@/components/post"; // Adjust this path as needed
 import Post from "@/components/post"; // Reuse the same Post component
 
@@ -71,23 +71,25 @@ const Admin = () => {
   }
 
   return (
-    <div className="p-4">
-      <h1 className="text-3xl font-bold mb-4">Admin Dashboard</h1>
-      {flaggedPosts.length === 0 ? (
-        <p>No flagged posts available.</p>
-      ) : (
-        flaggedPosts.map((post) => (
-          <div key={post._id} className="mb-4">
-            <Post
-              {...post}
-              adminView={true}
-              onApprove={handleApprove}
-              onDelete={handleDelete}
-            />
-          </div>
-        ))
-      )}
-    </div>
+    <Suspense fallback={<div>Loading...</div>}>
+      <div className="p-4">
+        <h1 className="text-3xl font-bold mb-4">Admin Dashboard</h1>
+        {flaggedPosts.length === 0 ? (
+          <p>No flagged posts available.</p>
+        ) : (
+          flaggedPosts.map((post) => (
+            <div key={post._id} className="mb-4">
+              <Post
+                {...post}
+                adminView={true}
+                onApprove={handleApprove}
+                onDelete={handleDelete}
+              />
+            </div>
+          ))
+        )}
+      </div>
+    </Suspense>
   );
 };
 
