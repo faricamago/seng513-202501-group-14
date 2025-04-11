@@ -3,7 +3,7 @@
 import { uploadImage } from './upload.js';
 import User from '../models/User.js';
 import { getStoragePathFromUrl, deleteFileFromFirebase } from "../firebaseStorageHelper.js";
-import bcrypt from 'bcrypt';
+import bcryptjs from 'bcryptjs';
 
 // controllers/userController.js
 export const registerUser = async (req, res) => {
@@ -33,7 +33,7 @@ export const loginUser = async (req, res) => {
     }
 
     // Use bcrypt.compare to check if the entered password matches the hashed password
-    const isMatch = await bcrypt.compare(req.body.password, user.password);
+    const isMatch = await bcryptjs.compare(req.body.password, user.password);
     if (!isMatch) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }

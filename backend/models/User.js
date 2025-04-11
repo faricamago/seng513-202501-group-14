@@ -1,7 +1,7 @@
 // models/User.js
 
 import mongoose from 'mongoose';
-import bcrypt from 'bcrypt';  // Import bcrypt
+import bcryptjs from 'bcryptjs';  // Import bcrypt
 
 const { Schema } = mongoose;
 const SALT_WORK_FACTOR = 10;  // You can adjust this value
@@ -26,9 +26,9 @@ userSchema.pre('save', async function(next) {
 
   try {
     // Generate a salt with a given factor
-    const salt = await bcrypt.genSalt(SALT_WORK_FACTOR);
+    const salt = await bcryptjs.genSalt(SALT_WORK_FACTOR);
     // Hash the password using the salt
-    this.password = await bcrypt.hash(this.password, salt);
+    this.password = await bcryptjs.hash(this.password, salt);
     next();
   } catch (error) {
     next(error);
