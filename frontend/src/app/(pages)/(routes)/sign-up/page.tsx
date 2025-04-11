@@ -8,9 +8,7 @@ export const metadata: Metadata = {
 };
 
 const Page = () => {
-  return (
-    <SignUp/>
-  )
+  return <SignUp/>
 };
 
 export default Page;
