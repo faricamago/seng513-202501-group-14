@@ -1,11 +1,9 @@
 import Feed from '@/components/feed'
-import React from 'react'
+import React, { Suspense } from 'react'
 
 const Home = () => {
   return (
-    <div>
-        <Feed className='w-full'/>
-    </div>
+    <Feed className='w-full'/>
   )
 }
 

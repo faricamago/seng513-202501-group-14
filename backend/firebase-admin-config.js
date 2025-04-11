@@ -1,10 +1,10 @@
 // firebase-admin-config.js
 import admin from "firebase-admin";
-import serviceAccount from "./dinoverse-file-uploads-firebase-adminsdk-fbsvc-3163feb581.json" assert { type: "json" };
+// import serviceAccount from "./dinoverse-file-uploads-firebase-adminsdk-fbsvc-3163feb581.json" assert { type: "json" };
 // Don't delete it!!!!
-// import { createRequire } from "module";
-// const require = createRequire(import.meta.url);
-// const serviceAccount = require("./dinoverse-file-uploads-firebase-adminsdk-fbsvc-3163feb581.json");
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+const serviceAccount = require("./dinoverse-file-uploads-firebase-adminsdk-fbsvc-3163feb581.json");
 
 // Initialize the Firebase Admin app if not already initialized
 if (!admin.apps.length) {

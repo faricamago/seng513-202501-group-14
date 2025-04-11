@@ -1,8 +1,8 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { useSearchParams } from 'next/navigation';
+import React, { Suspense, useEffect, useState } from "react";
 import Post from "./post";
 import { PostType } from "./post";
+import { useSearchParams } from "next/navigation";
 
 interface FeedProps {
   className?: string;
@@ -13,16 +13,13 @@ interface FeedProps {
 const Feed: React.FC<FeedProps> = ({ className, filterBy, filterByUser }) => {
   const [posts, setPosts] = useState<PostType[]>([]);
   const searchParams = useSearchParams();
-  // Check for both filter and search query parameters
-  const filterQuery = searchParams.get("filter");
-  const searchQuery = searchParams.get("query") || "";
+  const queryParam = searchParams.get("query") || "";
 
   useEffect(() => {
     async function fetchPosts() {
       try {
-        // Append the query parameter if present
-        const url = searchQuery
-          ? `http://localhost:5000/api/posts?query=${encodeURIComponent(searchQuery)}`
+        const url = queryParam
+          ? `http://localhost:5000/api/posts?query=${encodeURIComponent(queryParam)}`
           : "http://localhost:5000/api/posts";
         const res = await fetch(url);
         if (!res.ok) {
@@ -30,18 +27,18 @@ const Feed: React.FC<FeedProps> = ({ className, filterBy, filterByUser }) => {
         }
         const data: PostType[] = await res.json();
 
-        let processedPosts = data.map((post: PostType) => {
+        let processedPosts = data.map((post) => {
           if (Array.isArray(post.images)) {
-            post.images = post.images.map((imgPath) => 
+            post.images = post.images.map((imgPath) =>
               typeof imgPath === "string" ? imgPath.replace(/\\/g, '/') : imgPath
             );
           }
           return post;
         });
 
-        // Apply additional filtering if needed (by following, mine, announcements, etc.)
-        if (filterBy === "following" || filterQuery === "following") {
-          const loggedInUsername = sessionStorage.getItem("username");
+        const loggedInUsername = sessionStorage.getItem("username");
+
+        if (filterBy === "following") {
           if (loggedInUsername) {
             const followRes = await fetch(`http://localhost:5000/api/users/following?username=${loggedInUsername}`);
             if (!followRes.ok) throw new Error("Failed to fetch following list");
@@ -49,9 +46,11 @@ const Feed: React.FC<FeedProps> = ({ className, filterBy, filterByUser }) => {
             processedPosts = processedPosts.filter(post => followingList.includes(post.username));
           }
         } else if (filterBy === "announcements") {
-          processedPosts = processedPosts.filter(post => post.announcement === true);
+          const adminRes = await fetch("http://localhost:5000/api/users/admins");
+          if (!adminRes.ok) throw new Error("Failed to fetch admin users");
+          const adminUsers: string[] = await adminRes.json();
+          processedPosts = processedPosts.filter(post => adminUsers.includes(post.username));
         } else if (filterBy === "mine") {
-          const loggedInUsername = sessionStorage.getItem("username");
           if (loggedInUsername) {
             processedPosts = processedPosts.filter(post => post.username === loggedInUsername);
           }
@@ -59,36 +58,41 @@ const Feed: React.FC<FeedProps> = ({ className, filterBy, filterByUser }) => {
           processedPosts = processedPosts.filter(post => post.username === filterByUser);
         }
 
-        // Sort posts by createdAt date in descending order (newest first)
         const sortedPosts = processedPosts.sort(
-          (a: PostType, b: PostType) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
         setPosts(sortedPosts);
       } catch (error) {
         console.error("Error fetching posts:", error);
       }
     }
+
     fetchPosts();
-  }, [filterBy, filterByUser, searchQuery, filterQuery]);
+  }, [filterBy, filterByUser, queryParam]);
 
   if (posts.length === 0) {
-    if (filterBy === "following" || filterQuery === "following") {
+    if (filterBy === "following") {
       return <p className="text-center">There are no posts by followed users.</p>;
     }
     if (filterBy === "mine") {
       return <p className="text-center">You haven't posted anything yet.</p>;
     }
+    if (filterBy === "announcements") {
+      return <p className="text-center">There are no announcements right now.</p>;
+    }
     return <p className="text-center">No posts available.</p>;
   }
 
   return (
-    <div className={`flex flex-col gap-4 ${className}`}>
-      {posts.map((post) => (
-        <div key={post._id} className="w-full">
-          <Post {...post} />
-        </div>
-      ))}
-    </div>
+    <Suspense fallback={<p className="text-center">Loading posts...</p>}>
+      <div className={`flex flex-col gap-4 ${className}`}>
+        {posts.map((post) => (
+          <div key={post._id} className="w-full">
+            <Post {...post} />
+          </div>
+        ))}
+      </div>
+  </Suspense>
   );
 };
 

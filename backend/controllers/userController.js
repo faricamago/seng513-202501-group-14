@@ -184,3 +184,13 @@ export const updateBio = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+export const getAdmins = async (req, res) => {
+  try {
+    const admins = await User.find({ role: 'admin' }).select('username');
+    const usernames = admins.map(admin => admin.username);
+    res.status(200).json(usernames);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}

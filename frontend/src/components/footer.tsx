@@ -76,18 +76,13 @@ const Footer: React.FC = () => {
   }
 
   const handleAnnouncementsClick = () => {
-    if (username) {
-      window.location.href = "/?filter=announcements";
-    } else {
-      setLoginMessage("Login to posts from UofC");
-      setShowLoginModal(true);
-    }
+    window.location.href = "/announcements";
   };
 
   const handleFollowersClick = () => {
     if (username) {
       // Navigate to feed page with filter parameter set to "following"
-      window.location.href = "/?filter=following";
+      window.location.href = "/following";
     } else {
       setLoginMessage("Login to see posts from followers");
       setShowLoginModal(true);
@@ -115,15 +110,15 @@ const Footer: React.FC = () => {
       <nav className="fixed bottom-0 left-0 w-full h-16 z-40 flex bg-[var(--primary-pink)] text-white border-t-8 border-[var(--uoc-yellow)]">
         
         {/* See All Posts Button */}
-        <button className="flex-1 flex items-center justify-center p-4 hover:cursor-pointer"
+        <button className="flex-1 flex group h-full items-center justify-center p-4 hover:cursor-pointer hover:bg-[var(--hover-primary-pink)]"
                 onClick={handleWorldClick}>
-          <LuEarth className="text-3xl hover:text-[var(--uoc-yellow)]" />
+          <LuEarth className="text-3xl group-hover:text-[var(--uoc-yellow)]" />
         </button>
 
         {/* University Posts Button */}
-        <button className="flex-1 flex items-center justify-center p-4 hover:cursor-pointer"
+        <button className="flex-1 flex group items-center justify-center p-4 hover:cursor-pointer hover:bg-[var(--hover-primary-pink)]"
                 onClick={handleAnnouncementsClick}>
-          <LuSchool className="text-3xl hover:text-[var(--uoc-yellow)]" />
+          <LuSchool className="text-3xl group-hover:text-[var(--uoc-yellow)]" />
         </button>
 
         {/* New Post Button */}
@@ -136,15 +131,15 @@ const Footer: React.FC = () => {
         </div>
 
         {/* Friends Button */}
-        <button className="flex-1 flex items-center justify-center p-4 hover:cursor-pointer"
+        <button className="flex-1 flex group items-center justify-center p-4 hover:cursor-pointer hover:bg-[var(--hover-primary-pink)]"
                 onClick={handleFollowersClick}>
-          <MdOutlinePeopleAlt className="text-3xl hover:text-[var(--uoc-yellow)]" />
+          <MdOutlinePeopleAlt className="text-3xl group-hover:text-[var(--uoc-yellow)]" />
         </button>
 
         {/* Profile Button */}
-        <button className="flex-1 flex items-center justify-center p-4 hover:cursor-pointer"
+        <button className="flex-1 flex group items-center justify-center p-4 hover:cursor-pointer hover:bg-[var(--hover-primary-pink)]"
                 onClick={handleProfileClick}>
-          <MdOutlinePersonOutline className="text-3xl hover:text-[var(--uoc-yellow)]" />
+          <MdOutlinePersonOutline className="text-3xl group-hover:text-[var(--uoc-yellow)]" />
         </button>
       </nav>
 
