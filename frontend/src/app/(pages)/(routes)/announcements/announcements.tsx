@@ -1,9 +1,11 @@
 import Feed from '@/components/feed'
-import React from 'react'
+import React, { Suspense } from 'react'
 
 const Announcements = () => {
   return (
-    <Feed filterBy='announcements' className='w-full' />
+    <Suspense>
+      <Feed filterBy='announcements' className='w-full' />
+    </Suspense>  
   )
 }
 

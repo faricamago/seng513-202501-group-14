@@ -3,7 +3,9 @@ import React, { Suspense } from 'react'
 
 const Home = () => {
   return (
-    <Feed className='w-full'/>
+    <Suspense>
+      <Feed className='w-full'/>
+    </Suspense>
   )
 }
 

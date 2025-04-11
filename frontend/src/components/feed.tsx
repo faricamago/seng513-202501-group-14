@@ -84,15 +84,13 @@ const Feed: React.FC<FeedProps> = ({ className, filterBy, filterByUser }) => {
   }
 
   return (
-    <Suspense fallback={<p className="text-center">Loading posts...</p>}>
-      <div className={`flex flex-col gap-4 ${className}`}>
-        {posts.map((post) => (
-          <div key={post._id} className="w-full">
-            <Post {...post} />
-          </div>
-        ))}
-      </div>
-  </Suspense>
+    <div className={`flex flex-col gap-4 ${className}`}>
+      {posts.map((post) => (
+        <div key={post._id} className="w-full">
+          <Post {...post} />
+        </div>
+      ))}
+    </div>
   );
 };
 
