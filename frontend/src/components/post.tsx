@@ -32,16 +32,24 @@ const Post: React.FC<PostType> = (props) => {
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(props.likes ? props.likes.length : 0);
 
-  // States for modals (edit, delete, report)
+  // States for modals
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showReportConfirm, setShowReportConfirm] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [loginMessage, setLoginMessage] = useState("");
+  
 
   useEffect(() => {
     if (loggedInUsername && props.likes) {
       setIsLiked(props.likes.includes(loggedInUsername));
     }
   }, [loggedInUsername, props.likes]);
+
+  const goToLogin = () => {
+    setShowLoginModal(false);
+    window.location.href = "/login";
+  };
 
   // Fetch author's profile photo
   useEffect(() => {
@@ -65,7 +73,8 @@ const Post: React.FC<PostType> = (props) => {
 
   const ToggleLikePost = async (_id: string) => {
     if (!loggedInUsername) {
-      alert("Please log in to like a post.");
+      setLoginMessage("Log in to like a post");
+      setShowLoginModal(true);
       return;
     }
     try {
@@ -133,7 +142,8 @@ const Post: React.FC<PostType> = (props) => {
   const reportPost = async (postId: string) => {
     const loggedInUsername = sessionStorage.getItem("username");
     if (!loggedInUsername) {
-      alert("Please log in to report a post.");
+      setLoginMessage("Log in to report a post");
+      setShowLoginModal(true);
       return;
     }
     try {
@@ -192,16 +202,23 @@ const Post: React.FC<PostType> = (props) => {
               </button>
             </div>
           )}
-          {loggedInUsername != props.username && (
-          <div className="flex items-center gap-2">
-            <button
-          className="flex items-center gap-1 px-3 py-1 hover:text-blue-500 transition"
-          onClick={() => setShowReportConfirm(true)}
-            >
-          <FaRegFlag className="text-lg sm:text-2xl" />
-          <span>Report</span>
-            </button>
-          </div>
+          {loggedInUsername !== props.username && (
+            <div className="flex items-center gap-2">
+              <button
+                className="flex items-center gap-1 px-3 py-1 hover:text-blue-500 transition"
+                onClick={() => {
+                  if (loggedInUsername) {
+                    setShowReportConfirm(true);
+                  } else {
+                    setLoginMessage("Log in to report a post");
+                    setShowLoginModal(true);
+                  }
+                }}
+              >
+                <FaRegFlag className="text-lg sm:text-2xl" />
+                <span>Report</span>
+              </button>
+            </div>
           )}
         </>
       );
@@ -284,6 +301,7 @@ const Post: React.FC<PostType> = (props) => {
           </div>
         </div>
       )}
+      {/* Report Confirmation Modal on show if logged in!*/}
       {showReportConfirm && (
         <div className="fixed inset-0 flex items-center justify-center bg-[rgba(0,0,0,0.5)] z-50">
           <div className="bg-white p-8 rounded-xl shadow-2xl max-w-md mx-auto transform transition-all duration-300 hover:scale-105">
@@ -300,6 +318,25 @@ const Post: React.FC<PostType> = (props) => {
           </div>
         </div>
       )}
+
+      {/* Login Confirmation Modal */}
+      {showLoginModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-[rgba(0,0,0,0.5)] z-50">
+          <div className="bg-white p-8 rounded-xl shadow-2xl max-w-md mx-auto transform transition-all duration-300 hover:scale-105">
+            <h2 className="text-[var(--dark-color)] text-2xl font-bold text-center mb-4">Please Login</h2>
+            <p className="text-gray-700 text-center mb-6">{loginMessage}</p>
+            <div className="flex justify-center space-x-4">
+              <button onClick={() => setShowLoginModal(false)} className="px-4 py-2 bg-gray-300 text-[var(--dark-color)] rounded hover:bg-gray-400 transition">
+                Cancel
+              </button>
+              <button onClick={goToLogin} className="px-4 py-2 bg-[var(--primary-pink)] text-white rounded hover:bg-[var(--bright-pink)] transition">
+                Login
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    
     </div>
   );
 };

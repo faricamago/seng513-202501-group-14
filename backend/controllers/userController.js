@@ -3,6 +3,7 @@
 import { uploadImage } from './upload.js';
 import User from '../models/User.js';
 import { getStoragePathFromUrl, deleteFileFromFirebase } from "../firebaseStorageHelper.js";
+import bcrypt from 'bcrypt';
 
 // controllers/userController.js
 export const registerUser = async (req, res) => {
@@ -23,19 +24,25 @@ export const registerUser = async (req, res) => {
   }
 };
 
-
 // User login endpoint
 export const loginUser = async (req, res) => {
-try {
-  const user = await User.findOne({ email: req.body.email });
-  if (!user || user.password !== req.body.password) {
-    return res.status(401).json({ error: 'Invalid credentials' });
+  try {
+    const user = await User.findOne({ email: req.body.email });
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    // Use bcrypt.compare to check if the entered password matches the hashed password
+    const isMatch = await bcrypt.compare(req.body.password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    // In production, generate and return an authentication token here.
+    res.status(200).json({ message: 'Login successful', user });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
-  // In production, generate and return an authentication token here.
-  res.status(200).json({ message: 'Login successful', user });
-} catch (err) {
-  res.status(500).json({ error: err.message });
-}
 };
 
 // Follow a user
