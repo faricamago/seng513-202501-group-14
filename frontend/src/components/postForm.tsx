@@ -43,10 +43,11 @@ const PostForm: React.FC<PostFormProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onPost({ title, content, newImages, keptImages: existingImages });
-    // wait for 1 second before reloading the page to allow the post to be created
+    //window.location.reload();
+    //wait for 1 second before reloading the page to allow the post to be created
     setTimeout(() => {
         window.location.reload();
-      }, 1000);
+      }, 250);
   };
 
   return (

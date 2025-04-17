@@ -67,7 +67,7 @@ const Admin = () => {
   };
 
   if (loading) {
-    return <div className="p-4">Loading flagged posts...</div>;
+    return <div className="p-4">LOADING...</div>;
   }
 
   return (
