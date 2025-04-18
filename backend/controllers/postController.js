@@ -183,7 +183,7 @@ const reportPost = async (req, res) => {
 // Comment Handlers
 const getComments = async (req, res) => {
   try {
-    const post = await Post.findById(req.params.postId).select('comments');
+    const post = await Post.findById(req.params.postID).select('comments');
     if (!post) return res.status(404).json({ error: 'Post not found' });
     res.status(200).json(post.comments);
   } catch (error) {
@@ -199,7 +199,7 @@ const addComment = async (req, res) => {
   }
 
   try {
-    const post = await Post.findById(req.params.postId);
+    const post = await Post.findById(req.params.postID);
     if (!post) return res.status(404).json({ error: 'Post not found' });
 
     post.comments.push({ username, content });
