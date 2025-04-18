@@ -30,7 +30,7 @@ const Footer: React.FC = () => {
 
   const handlePost = async (data: { title: string; content: string; newImages?: File[]; keptImages?: string[] }) => {
     if (!data.title || !data.content) {
-      alert("Please fill in the title and content.");
+      // alert("Please fill in the title and content.");
       return;
     }
     // Create a FormData object to send files and other fields

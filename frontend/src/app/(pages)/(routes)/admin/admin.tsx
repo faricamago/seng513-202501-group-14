@@ -6,6 +6,9 @@ import Post from "@/components/post"; // Reuse the same Post component
 const Admin = () => {
   const [flaggedPosts, setFlaggedPosts] = useState<PostType[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [showModal, setShowModal] = useState(false);
+  const [message, setMessage] = useState('');
+  const [title, setTitle] = useState('');
 
   // Fetch flagged posts from the admin endpoint
   useEffect(() => {
@@ -39,10 +42,14 @@ const Admin = () => {
       }
       // Remove the approved post from the state
       setFlaggedPosts(flaggedPosts.filter((post) => post._id !== postId));
-      alert("Post approved successfully.");
+      setMessage("Post approved successfully.");
+      setTitle("Approved !");
+      setShowModal(true);
     } catch (error) {
       console.error(error);
-      alert("Error approving post.");
+      setMessage("Error approving post.");
+      setTitle("Error !");
+      setShowModal(true);
     }
   };
 
@@ -59,10 +66,14 @@ const Admin = () => {
       }
       // Remove the deleted post from the state
       setFlaggedPosts(flaggedPosts.filter((post) => post._id !== postId));
-      alert("Post deleted successfully.");
+      setMessage("Post deleted successfully.");
+      setTitle("Deleted !");
+      setShowModal(true);
     } catch (error) {
       console.error(error);
-      alert("Error deleting post.");
+      setMessage("Error deleting post.");
+      setTitle("Error !");
+      setShowModal(true);
     }
   };
 
@@ -89,6 +100,26 @@ const Admin = () => {
           ))
         )}
       </div>
+      {showModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-[rgba(0,0,0,0.5)] z-50">
+          <div className="bg-white p-8 rounded-xl shadow-2xl max-w-md mx-auto transform transition-all duration-300 hover:scale-105">
+            <h2 className="text-[var(--dark-color)] text-2xl font-bold text-center mb-4">
+            {title}
+            </h2>
+            <p className="text-gray-700 text-center mb-6">
+              {message}
+            </p>
+            <div className="flex justify-center">
+              <button
+                onClick={() => setShowModal(false)}
+                className="px-4 py-2 bg-[var(--primary-pink)] text-white rounded hover:bg-[var(--bright-pink)] transition"
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </Suspense>
   );
 };
