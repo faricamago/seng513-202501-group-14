@@ -110,37 +110,53 @@ const Footer: React.FC = () => {
       <nav className="fixed bottom-0 left-0 w-full h-16 z-40 flex bg-[var(--primary-pink)] text-white border-t-8 border-[var(--uoc-yellow)]">
         
         {/* See All Posts Button */}
-        <button className="flex-1 flex group h-full items-center justify-center p-4 hover:cursor-pointer hover:bg-[var(--hover-primary-pink)]"
-                onClick={handleWorldClick}>
-          <LuEarth className="text-3xl group-hover:text-[var(--uoc-yellow)]" />
-        </button>
-
+        <div className="relative group flex-1 flex group h-full items-center justify-center p-4 hover:cursor-pointer hover:bg-[var(--hover-primary-pink)]">
+          <button onClick={handleWorldClick}>
+            <LuEarth className="text-3xl group-hover:text-[var(--uoc-yellow)] cursor-pointer" />
+          </button>
+          <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-sm text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity">
+            See All Posts
+          </span>
+        </div>
         {/* University Posts Button */}
-        <button className="flex-1 flex group items-center justify-center p-4 hover:cursor-pointer hover:bg-[var(--hover-primary-pink)]"
-                onClick={handleAnnouncementsClick}>
-          <LuSchool className="text-3xl group-hover:text-[var(--uoc-yellow)]" />
-        </button>
-
+        <div className="relative group flex-1 flex group items-center justify-center p-4 hover:cursor-pointer hover:bg-[var(--hover-primary-pink)]">
+          <button onClick={handleAnnouncementsClick}>
+            <LuSchool className="text-3xl group-hover:text-[var(--uoc-yellow)] cursor-pointer" />
+          </button>
+          <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-sm text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity">
+              See Posts By University
+          </span>
+        </div>
         {/* New Post Button */}
-        <div className="flex-1 flex items-center justify-center relative">
+        <div className="group flex-1 flex items-center justify-center relative">
           <div className="bg-white text-[var(--primary-pink)] w-15 h-12 flex items-center justify-center 
                         rounded-md border-2 border-[var(--primary-pink)] absolute -top-4 cursor-pointer"
                onClick={handlePlusClick}>
             <FiPlus className="text-2xl hover:text-[var(--uoc-yellow)]" />
           </div>
+          <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-sm text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity">
+            Add a New Post
+          </span>
         </div>
 
         {/* Friends Button */}
-        <button className="flex-1 flex group items-center justify-center p-4 hover:cursor-pointer hover:bg-[var(--hover-primary-pink)]"
-                onClick={handleFollowersClick}>
-          <MdOutlinePeopleAlt className="text-3xl group-hover:text-[var(--uoc-yellow)]" />
-        </button>
-
+        <div className="relative group flex-1 flex group items-center justify-center p-4 hover:cursor-pointer hover:bg-[var(--hover-primary-pink)]">
+          <button onClick={handleFollowersClick}>
+            <MdOutlinePeopleAlt className="text-3xl group-hover:text-[var(--uoc-yellow)] cursor-pointer" />
+          </button>
+          <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-sm text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity">
+              See Post by People You Follow
+          </span>
+        </div>
         {/* Profile Button */}
-        <button className="flex-1 flex group items-center justify-center p-4 hover:cursor-pointer hover:bg-[var(--hover-primary-pink)]"
-                onClick={handleProfileClick}>
-          <MdOutlinePersonOutline className="text-3xl group-hover:text-[var(--uoc-yellow)]" />
-        </button>
+        <div className="relative group flex-1 flex group items-center justify-center p-4 hover:cursor-pointer hover:bg-[var(--hover-primary-pink)]">
+          <button onClick={handleProfileClick}>
+            <MdOutlinePersonOutline className="text-3xl group-hover:text-[var(--uoc-yellow)] cursor-pointer" />
+          </button>
+          <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-sm text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity">
+              Profile
+          </span>
+        </div>
       </nav>
 
       {showPostModal && (

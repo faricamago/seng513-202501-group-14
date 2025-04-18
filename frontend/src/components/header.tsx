@@ -66,20 +66,30 @@ const Header = () => {
             />
           </div>
           {role === 'admin' && (
+            <div className="w-1/20 flex items-center justify-center pr-1 max-sm:w-2/16 cursor-pointer relative group">
             <button
               onClick={() => router.push('/admin')}
-              className="w-1/20 flex items-center justify-center pr-1 max-sm:w-2/16 cursor-pointer"
+              className=""
             >
               <MdAdminPanelSettings className="text-3xl text-white hover:text-[var(--uoc-yellow)]" />
             </button>
+            <span className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-2 py-1 text-sm text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity">
+              Reported Posts
+              </span>
+            </div>
           )}
           {username && (
-            <button 
+            <div className="w-1/20 flex items-center justify-center max-sm:w-2/16 cursor-pointer relative group">
+              <button 
               onClick={() => setShowLogoutModal(true)} 
-              className="w-1/20 flex items-center justify-center max-sm:w-2/16 cursor-pointer"
-            >
+              className=""
+              >
               <LuLogOut className="text-3xl text-white hover:text-[var(--uoc-yellow)]" />
-            </button>
+              </button>
+              <span className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-2 py-1 text-sm text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity">
+              Logout
+              </span>
+            </div>
           )}
         </div>
       </div>
