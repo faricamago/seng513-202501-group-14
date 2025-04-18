@@ -22,5 +22,9 @@ router.delete('/:id', postController.deletePost);
 // Report a post
 router.post('/report', postController.reportPost);
 
+// get all comments from a post
+router.get('/:postID/comments',postController.getComments);
+// add a new comment to a post
+router.post('/:postID/comments', postController.addComment);
 export default router;
 

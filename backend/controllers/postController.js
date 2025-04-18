@@ -180,11 +180,47 @@ const reportPost = async (req, res) => {
   }
 };
 
+// Comment Handlers
+const getComments = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.postId).select('comments');
+    if (!post) return res.status(404).json({ error: 'Post not found' });
+    res.status(200).json(post.comments);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const addComment = async (req, res) => {
+  const { username, content } = req.body;
+  if (!username || !content) {
+    return res.status(400).json({ error: 'username and content are required' });
+  }
+
+  try {
+    const post = await Post.findById(req.params.postId);
+    if (!post) return res.status(404).json({ error: 'Post not found' });
+
+    post.comments.push({ username, content });
+    await post.save();
+
+    // return the newly added comment
+    const newComment = post.comments[post.comments.length - 1];
+    res.status(201).json(newComment);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+}
+
 export  {
   getPosts,
   createPost,
   togglePostLike,
   updatePost,
   deletePost,
-  reportPost
+  reportPost,
+  getComments,
+  addComment
 };
