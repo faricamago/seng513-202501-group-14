@@ -186,9 +186,14 @@ const Profile = () => {
             </div>
           ) : (
             // Make the bio clickable so the user can edit it
-            <p className="text-gray-600 cursor-pointer" onClick={() => { setNewBio(bio); setIsEditingBio(true); }}>
-              {bio}
-            </p>
+            <div className='relative group'>
+              <p className="text-gray-600 cursor-pointer" onClick={() => { setNewBio(bio); setIsEditingBio(true); }}>
+                {bio}
+              </p>
+              <span className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-2 py-1 text-sm text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                Click to edit bio.
+              </span>
+            </div>
           )
         ) : (
           <p className="text-gray-600">{bio}</p>
