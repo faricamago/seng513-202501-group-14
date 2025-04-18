@@ -4,7 +4,7 @@ interface CommentType {
   id: string;
   username: string;
   content: string;
-  creationAt: string;
+  createdAt: string;
 }
 
 interface CommentSectionProps {

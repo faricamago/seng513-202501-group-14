@@ -7,7 +7,7 @@ const { Schema } = mongoose;
 const commentSchema = new Schema({
   username: String,
   content: String,
-  creationAt: {type: Date, default: Date.now}
+  createdAt: {type: Date, default: Date.now}
 });
 
 const postSchema = new Schema({
