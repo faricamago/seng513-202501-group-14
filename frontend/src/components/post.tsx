@@ -8,6 +8,8 @@ import PostForm from "./postForm";
 import { MdOutlineModeEdit } from "react-icons/md";
 import { MdDeleteOutline } from "react-icons/md";
 import { FaRegFlag } from "react-icons/fa";
+import { BACKEND_PORT } from "@/common/global-vars";
+import UserList from "./userList";
 
 export interface PostType {
   _id: string;
@@ -37,6 +39,7 @@ const Post: React.FC<PostType> = (props) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showReportConfirm, setShowReportConfirm] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showLikesModal, setShowLikesModal] = useState(false);
   const [loginMessage, setLoginMessage] = useState("");
   
 
@@ -56,7 +59,7 @@ const Post: React.FC<PostType> = (props) => {
     async function fetchAuthorPhoto() {
       try {
         const res = await fetch(
-          `http://localhost:5000/api/users/profile?username=${props.username}`
+          `http://localhost:${BACKEND_PORT}/api/users/profile?username=${props.username}`
         );
         if (res.ok) {
           const data = await res.json();
@@ -78,7 +81,7 @@ const Post: React.FC<PostType> = (props) => {
       return;
     }
     try {
-      const res = await fetch("http://localhost:5000/api/posts/like", {
+      const res = await fetch(`http://localhost:${BACKEND_PORT}/api/posts/like`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -108,7 +111,7 @@ const Post: React.FC<PostType> = (props) => {
       formData.append("images", file);
     });
     try {
-      const res = await fetch(`http://localhost:5000/api/posts/${props._id}`, {
+      const res = await fetch(`http://localhost:${BACKEND_PORT}/api/posts/${props._id}`, {
         method: "PUT",
         body: formData,
       });
@@ -125,7 +128,7 @@ const Post: React.FC<PostType> = (props) => {
 
   const handleDeletePost = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/posts/${props._id}`, {
+      const res = await fetch(`http://localhost:${BACKEND_PORT}/api/posts/${props._id}`, {
         method: "DELETE",
       });
       if (!res.ok) {
@@ -147,7 +150,7 @@ const Post: React.FC<PostType> = (props) => {
       return;
     }
     try {
-      const res = await fetch("http://localhost:5000/api/posts/report", {
+      const res = await fetch(`http://localhost:${BACKEND_PORT}/api/posts/report`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ postId, reportedBy: loggedInUsername }),
@@ -189,7 +192,7 @@ const Post: React.FC<PostType> = (props) => {
             <button className="hover:text-blue-500 transition text-2xl" onClick={() => ToggleLikePost(props._id)}>
               {isLiked ? <BiSolidLike /> : <BiLike />}
             </button>
-            <span className="text-md font-bold">{likeCount}</span>
+            <span className="text-md font-bold cursor-pointer hover:underline" onClick={() => setShowLikesModal(true)}>{likeCount}</span>
           </div>
           <div className="flex-grow" />
           {loggedInUsername === props.username && (
@@ -335,6 +338,13 @@ const Post: React.FC<PostType> = (props) => {
             </div>
           </div>
         </div>
+      )}
+
+      {showLikesModal && (
+        <UserList
+          title="Likes"
+          users={props.likes}
+          onClose={() => setShowLikesModal(false)}/>
       )}
     
     </div>

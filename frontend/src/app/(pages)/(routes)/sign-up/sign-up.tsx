@@ -1,4 +1,5 @@
 'use client';
+import { BACKEND_PORT } from '@/common/global-vars';
 import React, { useState } from 'react';
 
 const SignUp = () => {
@@ -19,7 +20,7 @@ const SignUp = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/api/users/register", {
+      const response = await fetch(`http://localhost:${BACKEND_PORT}/api/users/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

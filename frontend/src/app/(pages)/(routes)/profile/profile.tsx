@@ -3,6 +3,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import Feed from '@/components/feed';
 import { useSearchParams } from 'next/navigation';
 import { MdOutlineModeEdit } from "react-icons/md";
+import { BACKEND_PORT } from '@/common/global-vars';
+import UserList from '@/components/userList';
 
 const Profile = () => {
   const searchParams = useSearchParams();
@@ -15,40 +17,65 @@ const Profile = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Set profile username from query or session storage
+  const [loggedInUser, setLoggedInUser] = useState("");
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [followStatus, setFollowStatus] = useState("");
+
+  const [followers, setFollowers] = useState<string[]>([]);
+  const [following, setFollowing] = useState<string[]>([]);
+  const [showModalType, setShowModalType] = useState<"followers" | "following" | null>(null);
+
   useEffect(() => {
     const queryUsername = searchParams.get("username");
-    const storedUsername = typeof window !== "undefined" ? sessionStorage.getItem("username") : "";
-    setProfileUsername(queryUsername || storedUsername || "");
+    const loggedInUsername = typeof window !== "undefined" ? sessionStorage.getItem("username") : "";
+    setProfileUsername(queryUsername || loggedInUsername || "");
   }, [searchParams]);
 
-  // Fetch profile data from the backend
   useEffect(() => {
     if (profileUsername) {
-      fetch(`http://localhost:5000/api/users/profile?username=${profileUsername}`)
+      fetch(`http://localhost:${BACKEND_PORT}/api/users/profile?username=${profileUsername}`)
         .then(res => res.json())
         .then(data => {
-          if (data.photo) {
-            setProfilePic(data.photo);
-          }
-          if(data.bio) {
-            setBio(data.bio);
-          }
+          if (data.photo) setProfilePic(data.photo);
+          if (data.bio) setBio(data.bio);
         })
         .catch(err => console.error("Error fetching profile:", err));
     }
   }, [profileUsername]);
 
-  // Following functionalities retained from your existing code...
-  const [loggedInUser, setLoggedInUser] = useState("");
-  const [isFollowing, setIsFollowing] = useState(false);
-  const [followStatus, setFollowStatus] = useState("");
+  useEffect(() => {
+    if (!profileUsername) return;
+  
+    const fetchData = async () => {
+      try {
+        const [followersRes, followingRes] = await Promise.all([
+          fetch(`http://localhost:${BACKEND_PORT}/api/users/followers?username=${profileUsername}`),
+          fetch(`http://localhost:${BACKEND_PORT}/api/users/following?username=${profileUsername}`)
+        ]);
+  
+        if (followersRes.ok) {
+          const followerList: string[] = await followersRes.json();
+          setFollowers(followerList);
+        }
+  
+        if (followingRes.ok) {
+          const followingList: string[] = await followingRes.json();
+          setFollowing(followingList);
+        }
+      } catch (err) {
+        console.error("Error fetching follow data:", err);
+      }
+    };
+  
+    fetchData();
+  }, [profileUsername]);
+  
 
   useEffect(() => {
-    const storedUsername = sessionStorage.getItem('username');
-    if (storedUsername) {
-      setLoggedInUser(storedUsername);
-      fetch(`http://localhost:5000/api/users/following?username=${storedUsername}`)
+    const loggedInUsername = sessionStorage.getItem('username');
+    if (loggedInUsername) {
+      setLoggedInUser(loggedInUsername);
+      fetch(`http://localhost:${BACKEND_PORT}/api/users/following?username=${loggedInUsername}`)
         .then(res => res.json())
         .then((followingList: string[]) => {
           if (followingList.includes(profileUsername)) {
@@ -71,7 +98,7 @@ const Profile = () => {
     formData.append('profilePic', file);
 
     try {
-      const res = await fetch("http://localhost:5000/api/users/uploadProfilePicture", {
+      const res = await fetch(`http://localhost:${BACKEND_PORT}/api/users/uploadProfilePicture`, {
         method: 'POST',
         body: formData,
       });
@@ -83,7 +110,6 @@ const Profile = () => {
     }
   };
 
-  // Handlers for editing bio
   const handleCancelBio = () => {
     setNewBio(bio);
     setIsEditingBio(false);
@@ -96,14 +122,12 @@ const Profile = () => {
       return;
     }
     try {
-      // This is a placeholder. You'd typically send a PUT/PATCH request to update the bio.
-      const res = await fetch("http://localhost:5000/api/users/updateBio", {
+      const res = await fetch(`http://localhost:${BACKEND_PORT}/api/users/updateBio`, {
         method: 'PUT',
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username: profileUsername, bio: newBio })
       });
       if (!res.ok) throw new Error("Failed to update bio");
-      // On success, update the displayed bio and exit edit mode.
       setBio(newBio);
       setIsEditingBio(false);
     } catch (err) {
@@ -113,25 +137,15 @@ const Profile = () => {
 
   const handleFollowToggle = async () => {
     try {
-      if (isFollowing) {
-        const res = await fetch("http://localhost:5000/api/users/unfollow", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ follower: loggedInUser, following: profileUsername })
-        });
-        if (!res.ok) throw new Error("Failed to unfollow user");
-        setIsFollowing(false);
-        setFollowStatus("Follow");
-      } else {
-        const res = await fetch("http://localhost:5000/api/users/follow", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ follower: loggedInUser, following: profileUsername })
-        });
-        if (!res.ok) throw new Error("Failed to follow user");
-        setIsFollowing(true);
-        setFollowStatus("Following");
-      }
+      const endpoint = isFollowing ? "unfollow" : "follow";
+      const res = await fetch(`http://localhost:${BACKEND_PORT}/api/users/${endpoint}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ follower: loggedInUser, following: profileUsername })
+      });
+      if (!res.ok) throw new Error("Follow/unfollow failed");
+      setIsFollowing(!isFollowing);
+      setFollowStatus(!isFollowing ? "Following" : "Follow");
     } catch (error) {
       console.error(error);
       setFollowStatus("Error");
@@ -165,7 +179,18 @@ const Profile = () => {
           </>
         )}
       </div>
+
       <h1 className="mt-4 text-2xl font-bold text-gray-800">{profileUsername}</h1>
+
+      <div className="flex gap-6 text-gray-700 text-base font-semibold mt-2">
+        <div className="cursor-pointer hover:underline" onClick={() => setShowModalType("followers")}>
+          {followers.length} Followers
+        </div>
+        <div className="cursor-pointer hover:underline" onClick={() => setShowModalType("following")}>
+          {following.length} Following
+        </div>
+      </div>
+
       <div className="mt-2 mb-4">
         {loggedInUser === profileUsername ? (
           isEditingBio ? (
@@ -185,7 +210,6 @@ const Profile = () => {
               </div>
             </div>
           ) : (
-            // Make the bio clickable so the user can edit it
             <div className='relative group'>
               <p className="text-gray-600 cursor-pointer" onClick={() => { setNewBio(bio); setIsEditingBio(true); }}>
                 {bio}
@@ -199,6 +223,7 @@ const Profile = () => {
           <p className="text-gray-600">{bio}</p>
         )}
       </div>
+
       {loggedInUser && loggedInUser !== profileUsername && (
         <button 
           onClick={handleFollowToggle}
@@ -211,14 +236,13 @@ const Profile = () => {
           {followStatus}
         </button>
       )}
-      {/* <p className="mt-2 mb-6 text-center text-gray-600 max-w-md">
-        This is {profileUsername}'s profile page.
-      </p> */}
+
       {loggedInUser === profileUsername ? (
         <Feed className='w-full' filterBy="mine" />
       ) : (
         <Feed className='w-full' filterByUser={profileUsername} />
       )}
+
       {showErrorModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-[rgba(0,0,0,0.5)] z-50">
           <div className="bg-white p-8 rounded-xl shadow-2xl max-w-md mx-auto transform transition-all duration-300 hover:scale-105">
@@ -238,6 +262,14 @@ const Profile = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {showModalType && (
+        <UserList
+          title={showModalType === "followers" ? "Followers" : "Following"}
+          users={showModalType === "followers" ? followers : following}
+          onClose={() => setShowModalType(null)}
+        />
       )}
     </div>
   );

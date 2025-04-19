@@ -3,6 +3,7 @@ import React, { Suspense, useEffect, useState } from "react";
 import Post from "./post";
 import { PostType } from "./post";
 import { useSearchParams } from "next/navigation";
+import { BACKEND_PORT } from "@/common/global-vars";
 
 interface FeedProps {
   className?: string;
@@ -22,10 +23,10 @@ const Feed: React.FC<FeedProps> = ({ className, filterBy, filterByUser }) => {
     async function fetchPosts() {
       try {
         const url = queryParam
-          ? `http://localhost:5000/api/posts?query=${encodeURIComponent(
+          ? `http://localhost:${BACKEND_PORT}/api/posts?query=${encodeURIComponent(
               queryParam
             )}`
-          : "http://localhost:5000/api/posts";
+          : `http://localhost:${BACKEND_PORT}/api/posts`;
         const res = await fetch(url);
         if (!res.ok) {
           throw new Error("Failed to fetch posts");
@@ -48,7 +49,7 @@ const Feed: React.FC<FeedProps> = ({ className, filterBy, filterByUser }) => {
         if (filterBy === "following") {
           if (loggedInUsername) {
             const followRes = await fetch(
-              `http://localhost:5000/api/users/following?username=${loggedInUsername}`
+              `http://localhost:${BACKEND_PORT}/api/users/following?username=${loggedInUsername}`
             );
             if (!followRes.ok)
               throw new Error("Failed to fetch following list");
@@ -59,7 +60,7 @@ const Feed: React.FC<FeedProps> = ({ className, filterBy, filterByUser }) => {
           }
         } else if (filterBy === "announcements") {
           const adminRes = await fetch(
-            "http://localhost:5000/api/users/admins"
+            `http://localhost:${BACKEND_PORT}/api/users/admins`
           );
           if (!adminRes.ok) throw new Error("Failed to fetch admin users");
           const adminUsers: string[] = await adminRes.json();
