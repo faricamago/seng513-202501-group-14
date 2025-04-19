@@ -15,7 +15,7 @@ const Admin = () => {
   useEffect(() => {
     const fetchFlaggedPosts = async () => {
       try {
-        const res = await fetch("http://localhost:" + BACKEND_PORT + "/api/admin/flagged-posts");
+        const res = await fetch(`http://localhost:${BACKEND_PORT}/api/admin/flagged-posts`);
         if (!res.ok) {
           throw new Error("Failed to fetch flagged posts.");
         }
@@ -33,7 +33,7 @@ const Admin = () => {
   // Approve a flagged post by removing its reported flag
   const handleApprove = async (postId: string) => {
     try {
-      const res = await fetch("http://localhost:" + BACKEND_PORT + "/api/admin/approve-post", {
+      const res = await fetch(`http://localhost:${BACKEND_PORT}/api/admin/approve-post`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ postId }),
@@ -57,7 +57,7 @@ const Admin = () => {
   // Delete a flagged post completely
   const handleDelete = async (postId: string) => {
     try {
-      const res = await fetch("http://localhost:" + BACKEND_PORT + "/api/admin/delete-post", {
+      const res = await fetch(`http://localhost:${BACKEND_PORT}/api/admin/delete-post`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ postId }),

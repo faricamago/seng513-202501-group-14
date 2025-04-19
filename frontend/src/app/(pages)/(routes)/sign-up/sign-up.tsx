@@ -20,7 +20,7 @@ const SignUp = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:" + BACKEND_PORT + "/api/users/register", {
+      const response = await fetch(`http://localhost:${BACKEND_PORT}/api/users/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

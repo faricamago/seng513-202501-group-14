@@ -48,7 +48,7 @@ const Footer: React.FC = () => {
     }
   
     try {
-      const response = await fetch("http://localhost:" + BACKEND_PORT + "/api/posts", {
+      const response = await fetch(`http://localhost:${BACKEND_PORT}/api/posts`, {
         method: "POST",
         body: formData,
       });

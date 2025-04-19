@@ -57,7 +57,7 @@ const Post: React.FC<PostType> = (props) => {
     async function fetchAuthorPhoto() {
       try {
         const res = await fetch(
-          `http://localhost:` + BACKEND_PORT + `/api/users/profile?username=${props.username}`
+          `http://localhost:${BACKEND_PORT}/api/users/profile?username=${props.username}`
         );
         if (res.ok) {
           const data = await res.json();
@@ -79,7 +79,7 @@ const Post: React.FC<PostType> = (props) => {
       return;
     }
     try {
-      const res = await fetch("http://localhost:" + BACKEND_PORT + "/api/posts/like", {
+      const res = await fetch(`http://localhost:${BACKEND_PORT}/api/posts/like`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -109,7 +109,7 @@ const Post: React.FC<PostType> = (props) => {
       formData.append("images", file);
     });
     try {
-      const res = await fetch(`http://localhost:` + BACKEND_PORT + `/api/posts/${props._id}`, {
+      const res = await fetch(`http://localhost:${BACKEND_PORT}/api/posts/${props._id}`, {
         method: "PUT",
         body: formData,
       });
@@ -126,7 +126,7 @@ const Post: React.FC<PostType> = (props) => {
 
   const handleDeletePost = async () => {
     try {
-      const res = await fetch(`http://localhost:` + BACKEND_PORT + `/api/posts/${props._id}`, {
+      const res = await fetch(`http://localhost:${BACKEND_PORT}/api/posts/${props._id}`, {
         method: "DELETE",
       });
       if (!res.ok) {
@@ -148,7 +148,7 @@ const Post: React.FC<PostType> = (props) => {
       return;
     }
     try {
-      const res = await fetch("http://localhost:" + BACKEND_PORT + "/api/posts/report", {
+      const res = await fetch(`http://localhost:${BACKEND_PORT}/api/posts/report`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ postId, reportedBy: loggedInUsername }),

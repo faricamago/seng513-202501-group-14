@@ -26,7 +26,7 @@ const Profile = () => {
   // Fetch profile data from the backend
   useEffect(() => {
     if (profileUsername) {
-      fetch(`http://localhost:` + BACKEND_PORT + `/api/users/profile?username=${profileUsername}`)
+      fetch(`http://localhost:${BACKEND_PORT}/api/users/profile?username=${profileUsername}`)
         .then(res => res.json())
         .then(data => {
           if (data.photo) {
@@ -49,7 +49,7 @@ const Profile = () => {
     const storedUsername = sessionStorage.getItem('username');
     if (storedUsername) {
       setLoggedInUser(storedUsername);
-      fetch(`http://localhost:` + BACKEND_PORT + `/api/users/following?username=${storedUsername}`)
+      fetch(`http://localhost:${BACKEND_PORT}/api/users/following?username=${storedUsername}`)
         .then(res => res.json())
         .then((followingList: string[]) => {
           if (followingList.includes(profileUsername)) {
@@ -72,7 +72,7 @@ const Profile = () => {
     formData.append('profilePic', file);
 
     try {
-      const res = await fetch("http://localhost:" + BACKEND_PORT + "/api/users/uploadProfilePicture", {
+      const res = await fetch(`http://localhost:${BACKEND_PORT}/api/users/uploadProfilePicture`, {
         method: 'POST',
         body: formData,
       });
@@ -98,7 +98,7 @@ const Profile = () => {
     }
     try {
       // This is a placeholder. You'd typically send a PUT/PATCH request to update the bio.
-      const res = await fetch("http://localhost:" + BACKEND_PORT + "/api/users/updateBio", {
+      const res = await fetch(`http://localhost:${BACKEND_PORT}/api/users/updateBio`, {
         method: 'PUT',
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username: profileUsername, bio: newBio })
@@ -115,7 +115,7 @@ const Profile = () => {
   const handleFollowToggle = async () => {
     try {
       if (isFollowing) {
-        const res = await fetch("http://localhost:" + BACKEND_PORT + "/api/users/unfollow", {
+        const res = await fetch(`http://localhost:${BACKEND_PORT}/api/users/unfollow`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ follower: loggedInUser, following: profileUsername })
@@ -124,7 +124,7 @@ const Profile = () => {
         setIsFollowing(false);
         setFollowStatus("Follow");
       } else {
-        const res = await fetch("http://localhost:" + BACKEND_PORT + "/api/users/follow", {
+        const res = await fetch(`http://localhost:${BACKEND_PORT}/api/users/follow`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ follower: loggedInUser, following: profileUsername })

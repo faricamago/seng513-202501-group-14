@@ -12,7 +12,7 @@ const Login = () => {
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:" + BACKEND_PORT + "/api/users/login", {
+      const res = await fetch(`http://localhost:${BACKEND_PORT}/api/users/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
