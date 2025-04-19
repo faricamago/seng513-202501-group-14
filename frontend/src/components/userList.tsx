@@ -5,6 +5,7 @@ import React, { useState, useEffect } from 'react';
 import { FiX } from 'react-icons/fi';
 import { BACKEND_PORT } from '@/common/global-vars';
 import Modal from './modal';
+import Link from 'next/link';
 
 interface UserListProps {
   users: string[];
@@ -63,14 +64,16 @@ const UserCard: React.FC<UserCardProps> = ({
 
   return (
     <li className="flex gap-16 items-center justify-between text-base">
-      <div className="flex gap-4 items-center rounded-full">
-        <img
-          src={profilePic ?? '/sample-profile/dino2.jpg'}
-          alt={username}
-          className="w-10 h-10 rounded-full object-cover"
-        />
-        <span>{username}</span>
-      </div>
+        <div className="flex gap-4 items-center rounded-full">
+          <img
+            src={profilePic ?? '/sample-profile/dino2.jpg'}
+            alt={username}
+            className="w-10 h-10 rounded-full object-cover"
+          />
+          <Link href={`/profile?username=${username}`}>
+            <span className="hover:underline cursor-pointer">{username}</span>
+          </Link>
+        </div>
       <div className="w-[100px] flex justify-end">
         {loggedInUsername && loggedInUsername !== username ? (
           <button
