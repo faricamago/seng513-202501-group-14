@@ -18,6 +18,9 @@ router.post('/follow', userController.followUser);
 // Get following list for a user (pass ?username=<username>)
 router.get('/following', userController.getFollowing);
 
+// Get follower list for a user (pass ?username=<username>)
+router.get('/followers', userController.getFollowers);
+
 router.get('/admins', userController.getAdmins);
 
 // Unfollow a user
