@@ -342,7 +342,7 @@ const Post: React.FC<PostType> = (props) => {
 
       {showLikesModal && (
         <UserList
-          title="Users who liked this post"
+          title="Likes"
           users={props.likes}
           onClose={() => setShowLikesModal(false)}/>
       )}
