@@ -7,6 +7,7 @@ import { MdOutlinePeopleAlt, MdOutlinePersonOutline } from "react-icons/md";
 import { FiPlus } from "react-icons/fi";
 import TipTapEditor from "./TipTapEditor"; // adjust the path as needed
 import PostForm from "./postForm";
+import { BACKEND_PORT } from "@/common/global-vars";
 
 const Footer: React.FC = () => {
   const [username, setUsername] = useState("");
@@ -47,7 +48,7 @@ const Footer: React.FC = () => {
     }
   
     try {
-      const response = await fetch("http://localhost:5000/api/posts", {
+      const response = await fetch("http://localhost:" + BACKEND_PORT + "/api/posts", {
         method: "POST",
         body: formData,
       });
