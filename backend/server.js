@@ -27,10 +27,12 @@ mongoose
 import userRoutes from './routes/user.js';
 import postRoutes from './routes/post.js';
 import adminRoutes from './routes/admin.js';
+import notificationsRouter from './routes/notification.js';
 
 app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/notifications', notificationsRouter);
 
 // Compute __dirname for ES modules
 const __filename = fileURLToPath(import.meta.url);

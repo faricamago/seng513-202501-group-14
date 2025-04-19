@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
 import Feed from '@/components/feed';
+import { NotificationBell } from '@/components/notificationBell';
 import { useSearchParams } from 'next/navigation';
 import { MdOutlineModeEdit } from "react-icons/md";
 
@@ -25,7 +26,7 @@ const Profile = () => {
   // Fetch profile data from the backend
   useEffect(() => {
     if (profileUsername) {
-      fetch(`http://localhost:5000/api/users/profile?username=${profileUsername}`)
+      fetch( `http://localhost:5000/api/users/profile?username=${encodeURIComponent(profileUsername)}`)
         .then(res => res.json())
         .then(data => {
           if (data.photo) {
@@ -140,6 +141,9 @@ const Profile = () => {
 
   return (
     <div className="flex flex-col items-center min-h-screen bg-transparent p-4">
+      <div className="absolute top-4 right-4">
+        <NotificationBell />
+      </div>
       <div className="relative inline-block">
         <img 
           src={profilePic ? profilePic : "/sample-profile/dino2.jpg"}
