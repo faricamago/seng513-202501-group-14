@@ -1,6 +1,7 @@
 // controllers/postController.js
 
 import Post from "../models/Post.js";
+import Notification from '../models/Notification.js';
 import { uploadImage } from  './upload.js'
 import { getStoragePathFromUrl, deleteFileFromFirebase } from "../firebaseStorageHelper.js";
 
@@ -170,6 +171,15 @@ const reportPost = async (req, res) => {
     post.reported = true;
     
     await post.save();
+
+    // create a “reported” notification for the author
+    await Notification.create({
+      user: post.username,
+      postId: post._id,
+      postTitle: post.title,
+      type: 'reported',
+      message: `Your post "${post.title}" has been reported and is under review by admin.`
+    });
 
     res.status(200).json({
       message: "Post reported successfully",

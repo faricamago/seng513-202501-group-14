@@ -44,12 +44,12 @@ const Admin = () => {
       // Remove the approved post from the state
       setFlaggedPosts(flaggedPosts.filter((post) => post._id !== postId));
       setMessage("Post approved successfully.");
-      setTitle("Approved !");
+      setTitle("Approved!");
       setShowModal(true);
     } catch (error) {
       console.error(error);
       setMessage("Error approving post.");
-      setTitle("Error !");
+      setTitle("Error!");
       setShowModal(true);
     }
   };
@@ -68,12 +68,12 @@ const Admin = () => {
       // Remove the deleted post from the state
       setFlaggedPosts(flaggedPosts.filter((post) => post._id !== postId));
       setMessage("Post deleted successfully.");
-      setTitle("Deleted !");
+      setTitle("Deleted!");
       setShowModal(true);
     } catch (error) {
       console.error(error);
       setMessage("Error deleting post.");
-      setTitle("Error !");
+      setTitle("Error!");
       setShowModal(true);
     }
   };
