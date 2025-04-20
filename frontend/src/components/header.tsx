@@ -1,10 +1,9 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { LuLogOut } from "react-icons/lu";
+import { LuLogOut, LuLogIn } from "react-icons/lu";
 import { MdAdminPanelSettings } from "react-icons/md";
 import { useRouter } from 'next/navigation';
-import { MdLogin } from "react-icons/md";
 
 const Header = () => {
   const [username, setUsername] = useState('');
@@ -100,7 +99,7 @@ const Header = () => {
             </button>
           ) : (
             <Link href="/login" className="p-2 rounded-md hover:bg-white/20 transition relative group flex items-center justify-center">
-              <MdLogin className="text-2xl text-white group-hover:text-[var(--uoc-yellow)]" />
+              <LuLogIn className="text-2xl text-white group-hover:text-[var(--uoc-yellow)]" />
               <span className="absolute left-1/2 -translate-x-1/2 top-full mt-1 px-2 py-1 text-xs text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity">
                 Login
               </span>
