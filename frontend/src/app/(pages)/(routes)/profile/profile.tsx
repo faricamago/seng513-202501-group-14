@@ -2,8 +2,9 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import Feed from "@/components/feed";
-import { useSearchParams } from "next/navigation";
+import Feed from '@/components/feed';
+import { NotificationBell } from '@/components/notificationBell';
+import { useSearchParams } from 'next/navigation';
 import { MdOutlineModeEdit } from "react-icons/md";
 import { BACKEND_PORT } from "@/common/global-vars";
 import UserList from "@/components/userList";
@@ -30,9 +31,22 @@ const Profile = () => {
 
   // 1) Determine which profile to show
   useEffect(() => {
-    const queryUser = searchParams.get("username");
-    setProfileUsername(queryUser || me || "");
-  }, [searchParams, me]);
+    const queryUsername = searchParams.get("username");
+    const loggedInUsername = typeof window !== "undefined" ? sessionStorage.getItem("username") : "";
+    setProfileUsername(queryUsername || loggedInUsername || "");
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (profileUsername) {
+      fetch( `http://localhost:5000/api/users/profile?username=${encodeURIComponent(profileUsername)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.photo) setProfilePic(data.photo);
+          if (data.bio) setBio(data.bio);
+        })
+        .catch(err => console.error("Error fetching profile:", err));
+    }
+  }, [profileUsername]);
 
   // 2) Fetch profile picture & bio
   useEffect(() => {
@@ -170,8 +184,10 @@ const Profile = () => {
 
   // 7) Render
   return (
-    <div className="flex flex-col items-center min-h-screen p-4">
-      {/* Profile image & edit */}
+    <div className="flex flex-col items-center min-h-screen bg-transparent p-4">
+      <div className="absolute top-4 right-4">
+        <NotificationBell />
+      </div>
       <div className="relative inline-block">
         <img
           src={profilePic || "/sample-profile/dino2.jpg"}
