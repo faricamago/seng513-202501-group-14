@@ -1,108 +1,137 @@
+// src/pages/profile.tsx
 "use client";
-import React, { useState, useEffect, useRef } from 'react';
-import Feed from '@/components/feed';
-import { useSearchParams } from 'next/navigation';
+
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import Feed from "@/components/feed";
+import { useSearchParams } from "next/navigation";
 import { MdOutlineModeEdit } from "react-icons/md";
-import { BACKEND_PORT } from '@/common/global-vars';
-import UserList from '@/components/userList';
+import { BACKEND_PORT } from "@/common/global-vars";
+import UserList from "@/components/userList";
 
 const Profile = () => {
   const searchParams = useSearchParams();
-  const [profileUsername, setProfileUsername] = useState("");
+  const [profileUsername, setProfileUsername] = useState<string>("");
   const [profilePic, setProfilePic] = useState<string>("");
-  const [bio, setBio] = useState("");
+  const [bio, setBio] = useState<string>("");
   const [isEditingBio, setIsEditingBio] = useState(false);
-  const [newBio, setNewBio] = useState("");
+  const [newBio, setNewBio] = useState<string>("");
   const [showErrorModal, setShowErrorModal] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const [loggedInUser, setLoggedInUser] = useState("");
-  const [isFollowing, setIsFollowing] = useState(false);
-  const [followStatus, setFollowStatus] = useState("");
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   const [followers, setFollowers] = useState<string[]>([]);
   const [following, setFollowing] = useState<string[]>([]);
+  const [isFollowing, setIsFollowing] = useState(false);
+
   const [showModalType, setShowModalType] = useState<"followers" | "following" | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // current logged-in user
+  const me = typeof window !== "undefined" ? sessionStorage.getItem("username") : "";
+
+  // 1) Determine which profile to show
   useEffect(() => {
-    const queryUsername = searchParams.get("username");
-    const loggedInUsername = typeof window !== "undefined" ? sessionStorage.getItem("username") : "";
-    setProfileUsername(queryUsername || loggedInUsername || "");
-  }, [searchParams]);
+    const queryUser = searchParams.get("username");
+    setProfileUsername(queryUser || me || "");
+  }, [searchParams, me]);
 
-  useEffect(() => {
-    if (profileUsername) {
-      fetch(`http://localhost:${BACKEND_PORT}/api/users/profile?username=${profileUsername}`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.photo) setProfilePic(data.photo);
-          if (data.bio) setBio(data.bio);
-        })
-        .catch(err => console.error("Error fetching profile:", err));
-    }
-  }, [profileUsername]);
-
+  // 2) Fetch profile picture & bio
   useEffect(() => {
     if (!profileUsername) return;
-  
-    const fetchData = async () => {
-      try {
-        const [followersRes, followingRes] = await Promise.all([
-          fetch(`http://localhost:${BACKEND_PORT}/api/users/followers?username=${profileUsername}`),
-          fetch(`http://localhost:${BACKEND_PORT}/api/users/following?username=${profileUsername}`)
-        ]);
-  
-        if (followersRes.ok) {
-          const followerList: string[] = await followersRes.json();
-          setFollowers(followerList);
-        }
-  
-        if (followingRes.ok) {
-          const followingList: string[] = await followingRes.json();
-          setFollowing(followingList);
-        }
-      } catch (err) {
-        console.error("Error fetching follow data:", err);
-      }
-    };
-  
-    fetchData();
+    fetch(
+      `http://localhost:${BACKEND_PORT}/api/users/profile?username=${profileUsername}`
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.photo) setProfilePic(data.photo);
+        if (data.bio) setBio(data.bio);
+      })
+      .catch((err) => console.error(err));
   }, [profileUsername]);
-  
+
+  // 3) Central reload of follow data
+  const reloadFollowData = useCallback(async () => {
+    if (!profileUsername) return;
+    try {
+      // a) Who follows *this* profile?
+      const fRes = await fetch(
+        `http://localhost:${BACKEND_PORT}/api/users/followers?username=${profileUsername}`
+      );
+      if (fRes.ok) {
+        const arr: string[] = await fRes.json();
+        setFollowers(arr);
+      }
+
+      // b) Who does *this* profile follow? (for "Following" count)
+      const gRes = await fetch(
+        `http://localhost:${BACKEND_PORT}/api/users/following?username=${profileUsername}`
+      );
+      if (gRes.ok) {
+        const arr: string[] = await gRes.json();
+        setFollowing(arr);
+      }
+
+      // c) Do I follow *this* profile?
+      if (me) {
+        const myRes = await fetch(
+          `http://localhost:${BACKEND_PORT}/api/users/following?username=${me}`
+        );
+        if (myRes.ok) {
+          const myArr: string[] = await myRes.json();
+          setIsFollowing(myArr.includes(profileUsername));
+        }
+      }
+    } catch (err) {
+      console.error("reloadFollowData error", err);
+    }
+  }, [profileUsername, me]);
+
+  // initial load & on followChanged event
+  useEffect(() => {
+    reloadFollowData();
+  }, [reloadFollowData]);
 
   useEffect(() => {
-    const loggedInUsername = sessionStorage.getItem('username');
-    if (loggedInUsername) {
-      setLoggedInUser(loggedInUsername);
-      fetch(`http://localhost:${BACKEND_PORT}/api/users/following?username=${loggedInUsername}`)
-        .then(res => res.json())
-        .then((followingList: string[]) => {
-          if (followingList.includes(profileUsername)) {
-            setIsFollowing(true);
-            setFollowStatus("Following");
-          } else {
-            setIsFollowing(false);
-            setFollowStatus("Follow");
-          }
-        })
-        .catch(err => console.error(err));
-    }
-  }, [profileUsername]);
+    const handler = () => reloadFollowData();
+    window.addEventListener("followChanged", handler);
+    return () => window.removeEventListener("followChanged", handler);
+  }, [reloadFollowData]);
 
-  const handleProfilePicChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (!event.target.files || event.target.files.length === 0) return;
+  // 4) Toggle follow/unfollow on this profile
+  const handleProfileFollowToggle = async () => {
+    if (!me) return;
+    try {
+      const action = isFollowing ? "unfollow" : "follow";
+      const res = await fetch(
+        `http://localhost:${BACKEND_PORT}/api/users/${action}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ follower: me, following: profileUsername }),
+        }
+      );
+      if (!res.ok) throw new Error("toggle failed");
+      // emit global event to refresh all follow data
+      window.dispatchEvent(new Event("followChanged"));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // 5) Profile-pic upload
+  const handleProfilePicChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (!event.target.files?.[0]) return;
     const file = event.target.files[0];
     const formData = new FormData();
-    formData.append('username', loggedInUser || profileUsername);
-    formData.append('profilePic', file);
-
+    formData.append("username", me || profileUsername);
+    formData.append("profilePic", file);
     try {
-      const res = await fetch(`http://localhost:${BACKEND_PORT}/api/users/uploadProfilePicture`, {
-        method: 'POST',
-        body: formData,
-      });
-      if (!res.ok) throw new Error("Profile picture upload failed");
+      const res = await fetch(
+        `http://localhost:${BACKEND_PORT}/api/users/uploadProfilePicture`,
+        { method: "POST", body: formData }
+      );
+      if (!res.ok) throw new Error("upload failed");
       const data = await res.json();
       setProfilePic(data.photo);
     } catch (err) {
@@ -110,6 +139,7 @@ const Profile = () => {
     }
   };
 
+  // 6) Bio edit handlers
   const handleCancelBio = () => {
     setNewBio(bio);
     setIsEditingBio(false);
@@ -122,12 +152,15 @@ const Profile = () => {
       return;
     }
     try {
-      const res = await fetch(`http://localhost:${BACKEND_PORT}/api/users/updateBio`, {
-        method: 'PUT',
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: profileUsername, bio: newBio })
-      });
-      if (!res.ok) throw new Error("Failed to update bio");
+      const res = await fetch(
+        `http://localhost:${BACKEND_PORT}/api/users/updateBio`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: profileUsername, bio: newBio }),
+        }
+      );
+      if (!res.ok) throw new Error("save failed");
       setBio(newBio);
       setIsEditingBio(false);
     } catch (err) {
@@ -135,41 +168,26 @@ const Profile = () => {
     }
   };
 
-  const handleFollowToggle = async () => {
-    try {
-      const endpoint = isFollowing ? "unfollow" : "follow";
-      const res = await fetch(`http://localhost:${BACKEND_PORT}/api/users/${endpoint}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ follower: loggedInUser, following: profileUsername })
-      });
-      if (!res.ok) throw new Error("Follow/unfollow failed");
-      setIsFollowing(!isFollowing);
-      setFollowStatus(!isFollowing ? "Following" : "Follow");
-    } catch (error) {
-      console.error(error);
-      setFollowStatus("Error");
-    }
-  };
-
+  // 7) Render
   return (
-    <div className="flex flex-col items-center min-h-screen bg-transparent p-4">
+    <div className="flex flex-col items-center min-h-screen p-4">
+      {/* Profile image & edit */}
       <div className="relative inline-block">
-        <img 
-          src={profilePic ? profilePic : "/sample-profile/dino2.jpg"}
-          alt="Profile" 
+        <img
+          src={profilePic || "/sample-profile/dino2.jpg"}
+          alt="Profile"
           className="w-32 h-32 rounded-full border-4 border-white shadow-lg"
         />
-        {loggedInUser === profileUsername && (
+        {me === profileUsername && (
           <>
-            <button 
+            <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
               className="absolute top-0 right-0 bg-[var(--primary-pink)] rounded-full p-1 cursor-pointer"
             >
-              <span className="text-white text-xs"><MdOutlineModeEdit /></span>
+              <MdOutlineModeEdit className="text-white text-xs" />
             </button>
-            <input 
+            <input
               type="file"
               accept="image/*"
               ref={fileInputRef}
@@ -180,19 +198,43 @@ const Profile = () => {
         )}
       </div>
 
-      <h1 className="mt-4 text-2xl font-bold text-gray-800">{profileUsername}</h1>
+      {/* Username */}
+      <h1 className="mt-4 text-2xl font-bold text-gray-800">
+        {profileUsername}
+      </h1>
 
-      <div className="flex gap-6 text-gray-700 text-base font-semibold mt-2">
-        <div className="cursor-pointer hover:underline" onClick={() => setShowModalType("followers")}>
+      {/* Follower/Following counts */}
+      <div className="flex gap-6 text-gray-700 font-semibold mt-2">
+        <div
+          className="cursor-pointer hover:underline"
+          onClick={() => setShowModalType("followers")}
+        >
           {followers.length} Followers
         </div>
-        <div className="cursor-pointer hover:underline" onClick={() => setShowModalType("following")}>
+        <div
+          className="cursor-pointer hover:underline"
+          onClick={() => setShowModalType("following")}
+        >
           {following.length} Following
         </div>
       </div>
 
-      <div className="mt-2 mb-4">
-        {loggedInUser === profileUsername ? (
+      {/* Follow/Unfollow button */}
+      {me && me !== profileUsername && (
+        <button
+          onClick={handleProfileFollowToggle}
+          className={`px-4 py-2 mt-4 rounded border-2 border-[var(--primary-pink)] ${
+            isFollowing
+              ? "bg-white text-red-500 hover:bg-red-100"
+              : "bg-[var(--primary-pink)] text-white hover:bg-[var(--bright-pink)]"
+          }`}>
+          {isFollowing ? "Following" : "Follow"}
+        </button>
+      )}
+
+      {/* Bio */}
+      <div className="mt-4 mb-6 w-full max-w-md text-gray-600 text-center">
+        {me === profileUsername ?
           isEditingBio ? (
             <div>
               <textarea
@@ -200,70 +242,39 @@ const Profile = () => {
                 value={newBio}
                 onChange={(e) => setNewBio(e.target.value)}
               />
-              <div className="flex justify-center space-x-4 p-4">
-                <button onClick={handleCancelBio} className="px-4 py-2 text-[var(--dark-color)] bg-gray-300 rounded hover:bg-gray-400 hover:cursor-pointer w-1/2">
-                  Cancel
-                </button>
-                <button onClick={handleSaveBio} className="px-4 py-2 bg-[var(--primary-pink)] text-white rounded hover:bg-[var(--bright-pink)] hover:cursor-pointer w-1/2">
-                  Save
-                </button>
+              <div className="flex justify-center gap-4 p-4">
+                <button onClick={handleCancelBio} className="px-4 py-2 bg-gray-300 rounded">Cancel</button>
+                <button onClick={handleSaveBio} className="px-4 py-2 bg-[var(--primary-pink)] text-white rounded">Save</button>
               </div>
             </div>
           ) : (
-            <div className='relative group'>
-              <p className="text-gray-600 cursor-pointer" onClick={() => { setNewBio(bio); setIsEditingBio(true); }}>
-                {bio}
-              </p>
-              <span className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-2 py-1 text-sm text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                Click to edit bio.
-              </span>
-            </div>
+            <p onClick={() => { setNewBio(bio); setIsEditingBio(true); }}>
+              {bio || "Click to add bio."}
+            </p>
           )
-        ) : (
-          <p className="text-gray-600">{bio}</p>
-        )}
+        :
+          <p>{bio}</p>
+        }
       </div>
 
-      {loggedInUser && loggedInUser !== profileUsername && (
-        <button 
-          onClick={handleFollowToggle}
-          className={`px-4 py-2 mb-4 rounded hover:cursor-pointer mt-2 border border-2 border-[var(--primary-pink)] ${
-            isFollowing 
-              ? "bg-white text-red-500 hover:bg-red-100" 
-              : "bg-[var(--primary-pink)] text-white hover:bg-[var(--bright-pink)]"
-          }`}
-        >
-          {followStatus}
-        </button>
-      )}
-
-      {loggedInUser === profileUsername ? (
-        <Feed className='w-full' filterBy="mine" />
+      {/* Feed */}
+      {me === profileUsername ? (
+        <Feed className="w-full" filterBy="mine" />
       ) : (
-        <Feed className='w-full' filterByUser={profileUsername} />
+        <Feed className="w-full" filterByUser={profileUsername} />
       )}
 
+      {/* Error modal */}
       {showErrorModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-[rgba(0,0,0,0.5)] z-50">
-          <div className="bg-white p-8 rounded-xl shadow-2xl max-w-md mx-auto transform transition-all duration-300 hover:scale-105">
-            <h2 className="text-[var(--dark-color)] text-2xl font-bold text-center mb-4">
-              Error
-            </h2>
-            <p className="text-gray-700 text-center mb-6">
-              {errorMessage}
-            </p>
-            <div className="flex justify-center">
-              <button
-                onClick={() => setShowErrorModal(false)}
-                className="px-4 py-2 bg-[var(--primary-pink)] text-white rounded hover:bg-[var(--bright-pink)] transition"
-              >
-                OK
-              </button>
-            </div>
+        <div className="fixed inset-0 flex items-center justify-center bg-[rgba(0,0,0,0.5)]">
+          <div className="bg-white p-6 rounded-lg">
+            <p>{errorMessage}</p>
+            <button onClick={() => setShowErrorModal(false)}>OK</button>
           </div>
         </div>
       )}
 
+      {/* Popup */}
       {showModalType && (
         <UserList
           title={showModalType === "followers" ? "Followers" : "Following"}
