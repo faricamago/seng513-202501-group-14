@@ -81,6 +81,18 @@ export const getFollowing = async (req, res) => {
   }
 };
 
+// Get the list of users that a given user is following
+export const getFollowers = async (req, res) => {
+  try {
+    const { username } = req.query;
+    const user = await User.findOne({ username });
+    if (!user) return res.status(404).json({ error: "User not found" });
+    res.status(200).json(user.followers || []);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 // Unfollow a user
 export const unfollowUser = async (req, res) => {
   console.log("unfollowUser called with body:", req.body);

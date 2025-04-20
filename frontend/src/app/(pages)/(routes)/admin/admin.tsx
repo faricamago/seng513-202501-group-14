@@ -2,6 +2,7 @@
 import React, { useState, useEffect, Suspense } from "react";
 import { PostType } from "@/components/post"; // Adjust this path as needed
 import Post from "@/components/post"; // Reuse the same Post component
+import { BACKEND_PORT } from "@/common/global-vars";
 
 const Admin = () => {
   const [flaggedPosts, setFlaggedPosts] = useState<PostType[]>([]);
@@ -14,7 +15,7 @@ const Admin = () => {
   useEffect(() => {
     const fetchFlaggedPosts = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/admin/flagged-posts");
+        const res = await fetch(`http://localhost:${BACKEND_PORT}/api/admin/flagged-posts`);
         if (!res.ok) {
           throw new Error("Failed to fetch flagged posts.");
         }
@@ -32,7 +33,7 @@ const Admin = () => {
   // Approve a flagged post by removing its reported flag
   const handleApprove = async (postId: string) => {
     try {
-      const res = await fetch("http://localhost:5000/api/admin/approve-post", {
+      const res = await fetch(`http://localhost:${BACKEND_PORT}/api/admin/approve-post`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ postId }),
@@ -56,7 +57,7 @@ const Admin = () => {
   // Delete a flagged post completely
   const handleDelete = async (postId: string) => {
     try {
-      const res = await fetch("http://localhost:5000/api/admin/delete-post", {
+      const res = await fetch(`http://localhost:${BACKEND_PORT}/api/admin/delete-post`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ postId }),

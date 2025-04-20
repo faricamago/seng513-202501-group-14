@@ -28,6 +28,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased overscroll-none`}
       >
         {children}
+        <div id="modal-root" />
       </body>
     </html>
   );
