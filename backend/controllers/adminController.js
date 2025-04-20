@@ -29,6 +29,7 @@ export const approvePost = async (req, res) => {
     await Notification.create({
       user: post.username,
       postId: post._id,
+      postTitle: post.title,
       type: 'approved',
       message: `Your post "${post.title}" has been approved by admin.`
     });

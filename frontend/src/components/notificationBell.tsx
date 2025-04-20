@@ -1,7 +1,7 @@
 // components/notificationBell.tsx
 'use client';
 import React, { useEffect, useState } from 'react';
-import { FaEnvelope } from 'react-icons/fa';
+import { FaBell } from 'react-icons/fa';
 import { MdClose } from 'react-icons/md';
 
 interface Notification {
@@ -42,8 +42,8 @@ export const NotificationBell: React.FC = () => {
   return (
     <div className="relative">
       <button onClick={()=>setOpen(!open)}>
-        <FaEnvelope className="text-xl text-gray-700" />
-        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1">
+        <FaBell className="text-3xl text-[var(--uoc-yellow)]" />
+        <span className="absolute -top-1 -right-1 bg-[var(--primary-pink)] text-white text-xs rounded-full px-1">
           {notes.length}
         </span>
       </button>
@@ -57,11 +57,7 @@ export const NotificationBell: React.FC = () => {
               >
                 <MdClose />
               </button>
-              <p className="font-medium">{n.message}</p>
-              <div className="mt-2 p-2 bg-gray-50 rounded text-sm">
-                <strong>{n.title}</strong>
-                
-              </div>
+              <p className="font-medium mt-2 ">{n.message}</p>
             </div>
           ))}
         </div>

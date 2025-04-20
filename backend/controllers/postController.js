@@ -176,6 +176,7 @@ const reportPost = async (req, res) => {
     await Notification.create({
       user: post.username,
       postId: post._id,
+      postTitle: post.title,
       type: 'reported',
       message: `Your post "${post.title}" has been reported and is under review by admin.`
     });
