@@ -144,15 +144,19 @@ const UserList: React.FC<UserListProps> = ({
           </button>
         </div>
         <ul className="max-h-96 overflow-y-auto flex flex-col gap-4 p-4">
-          {users.map((u) => (
-            <UserCard
+            {users.length > 0 ? (
+            users.map((u) => (
+              <UserCard
               key={u}
               username={u}
               profilePic={profilePics[u]}
               initialFollowing={!!followingMap[u]}
               loggedInUsername={loggedInUsername}
-            />
-          ))}
+              />
+            ))
+            ) : (
+            <div className="text-center text-gray-500 px-16">No users found</div>
+            )}
         </ul>
       </div>
     </Modal>
