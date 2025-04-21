@@ -271,9 +271,14 @@ const Profile = () => {
               </div>
             </div>
           ) : (
+            <div className="relative group">
             <p onClick={() => { setNewBio(bio); setIsEditingBio(true); }}>
               {bio || "Click to add bio."}
             </p>
+            <span className="absolute left-1/2 -translate-x-1/2 top-full mt-1 px-2 py-1 text-xs text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                Click to edit your bio
+            </span>
+            </div>
           )
         :
           <p>{bio}</p>
