@@ -26,6 +26,7 @@ export interface PostType {
   adminView?: boolean;
   onApprove?: (postId: string) => void;
   onDelete?: (postId: string) => void;
+  reported?: boolean;
 }
 
 const Post: React.FC<PostType> = (props) => {
@@ -282,6 +283,11 @@ const Post: React.FC<PostType> = (props) => {
           )}
         </div>
         <div className="flex flex-col flex-grow">
+          {props.reported && loggedInUsername === props.username && (
+            <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4 rounded-lg">
+              This post has been reported and is under review by the admin team.
+            </div>
+          )}
           <Link href={`/profile?username=${props.username}`}>
             <h3 className="font-bold text-lg text-gray-900 hover:underline">
               {props.username}
