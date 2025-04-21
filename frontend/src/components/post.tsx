@@ -26,6 +26,7 @@ export interface PostType {
   adminView?: boolean;
   onApprove?: (postId: string) => void;
   onDelete?: (postId: string) => void;
+
   reported?: boolean;
 }
 

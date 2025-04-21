@@ -14,6 +14,8 @@ const postSchema = new Schema({
   comments: [{
     username: { type: String, required: true },
     content: { type: String, required: true },
+    createdAt: { type: Date, default: Date.now },
+    likes: [{ type: String }] 
   }],
   reported: { type: Boolean, default: false },
   announcement: { type: Boolean, default: false },

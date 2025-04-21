@@ -1,17 +1,20 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { BACKEND_PORT } from "@/common/global-vars";
+import { FaCommentSlash } from "react-icons/fa";
 
 interface CommentType {
   username: string;
   content: string;
   createdAt?: string;
   index: number;
+  likes?: string[];
 }
 
 const CommentSection: React.FC<{ postId: string }> = ({ postId }) => {
   console.log("CommentSection loaded for post:", postId);
   const [comments, setComments] = useState<CommentType[]>([]);
+  const [showComments, setShowComments] = useState(true);
 
   // Fetch comments
   useEffect(() => {
@@ -66,39 +69,92 @@ const CommentSection: React.FC<{ postId: string }> = ({ postId }) => {
     }
   };
 
+  //like a comment
+  const handleLikeComment = async (index: number) => {
+    const username = sessionStorage.getItem("username");
+    if (!username) return;
+
+    try {
+      const res = await fetch(
+        `http://localhost:${BACKEND_PORT}/api/comments/${postId}/${index}/like`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username }),
+        }
+      );
+      if (res.ok) {
+        const data = await res.json();
+        setComments((prev) =>
+          prev.map((c) => (c.index === index ? { ...c, likes: data.likes } : c))
+        );
+      }
+    } catch (err) {
+      console.error("Failed to like comment:", err);
+    }
+  };
+
   return (
     <div className="bg-white p-6 rounded-2xl shadow-lg mt-6">
       <h4 className="text-xl font-bold text-[var(--primary-pink)] mb-4 border-b border-[var(--verylight-pink)] pb-2">
         Comments
       </h4>
-      <div className="flex flex-col gap-4">
-        {comments.map((c) => (
-          <div
-            key={c.index}
-            className="p-4 bg-[var(--verylight-pink)] rounded-lg"
+      {comments.length > 0 && (
+        <>
+          <button
+            onClick={() => setShowComments(!showComments)}
+            className="text-sm text-[var(--primary-pink)] font-semibold mb-4 underline hover:text-[var(--bright-pink)] transition"
           >
-            <div className="flex items-center justify-between mb-2">
-              <span className="font-semibold text-[var(--primary-pink)]">
-                {c.username}
-              </span>
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-500">
-                  {new Date(c.createdAt || "").toLocaleString()}
-                </span>
-                {sessionStorage.getItem("username") === c.username && (
-                  <button
-                    onClick={() => handleDeleteComment(c.index)}
-                    className="text-sm text-red-500 hover:underline"
-                  >
-                    Delete
-                  </button>
-                )}
-              </div>
+            {showComments ? "Hide comments" : "Show comments"} (
+            {comments.length})
+          </button>
+          {showComments && (
+            <div className="flex flex-col gap-4">
+              {comments.map((c) => (
+                <div
+                  key={c.index}
+                  className="p-4 bg-[var(--verylight-pink)] rounded-lg"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-semibold text-[var(--primary-pink)]">
+                      {c.username}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-gray-500">
+                        {new Date(c.createdAt || "").toLocaleString()}
+                      </span>
+                      {sessionStorage.getItem("username") === c.username && (
+                        <div>
+                          <button
+                            onClick={() => handleDeleteComment(c.index)}
+                            className="text-sm text-red-500 hover:underline"
+                          >
+                            Delete
+                          </button>
+
+                          <button
+                            onClick={() => handleLikeComment(c.index)}
+                            className={`text-sm ${
+                              c.likes?.includes(
+                                sessionStorage.getItem("username") || ""
+                              )
+                                ? "text-[var(--primary-pink)] font-bold"
+                                : "text-gray-500"
+                            } hover:underline`}
+                          >
+                            ❤️ {c.likes?.length || 0}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <p className="text-[var(--foreground)]">{c.content}</p>
+                </div>
+              ))}
             </div>
-            <p className="text-[var(--foreground)]">{c.content}</p>
-          </div>
-        ))}
-      </div>
+          )}
+        </>
+      )}
       <form
         onSubmit={(e) => {
           e.preventDefault();
