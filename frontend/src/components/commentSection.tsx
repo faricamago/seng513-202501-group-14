@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { MdOutlineModeEdit,  MdDeleteOutline} from "react-icons/md";
 import { GiDinosaurRex } from "react-icons/gi";
@@ -22,6 +22,7 @@ const CommentSection: React.FC<Props> = ({
     : "";
 
   const [comments, setComments] = useState<CommentType[]>(initialComments);
+  const [avatars,  setAvatars]  = useState<Record<string, string>>({});
   const [newText, setNewText]   = useState("");
   const [editId, setEditId]     = useState<string | null>(null);
   const [editText, setEditText] = useState("");
@@ -89,6 +90,38 @@ const CommentSection: React.FC<Props> = ({
     syncState(post.comments);
   };
 
+  /* fetch current photos for all unique commenters */
+    useEffect(() => {
+        (async () => {
+        const need: string[] = [];
+        comments.forEach(c => {
+            if (!avatars[c.username]) need.push(c.username);
+        });
+        await Promise.all(
+            Array.from(new Set(need)).map(async (u) => {
+            const res = await fetch(
+                `http://localhost:${BACKEND_PORT}/api/users/profile?username=${u}`
+            );
+            if (res.ok) {
+                const { photo } = await res.json();
+                setAvatars((prev) => ({ ...prev, [u]: photo || "" }));
+            }
+            })
+        );
+        })();
+    }, [comments]);
+
+    useEffect(() => {
+        const handler = (e: any) => {
+          const { username, photo } = e.detail || {};
+          if (!username) return;
+          setAvatars((prev) => ({ ...prev, [username]: photo || "" }));
+        };
+        window.addEventListener("profilePicUpdated", handler);
+        return () => window.removeEventListener("profilePicUpdated", handler);
+      }, []);
+      
+
   /* ---------- UI ---------- */
   return (
     <div className="px-6 pb-4 mt-2 space-y-4">
@@ -98,9 +131,9 @@ const CommentSection: React.FC<Props> = ({
         <div key={c._id} className="flex gap-3 text-sm">
           {/* avatar */}
           <Link href={`/profile?username=${c.username}`}>
-            {c.photo ? (
+            {(avatars[c.username] || c.photo) ? (
               <img
-                src={c.photo}
+                src={avatars[c.username] || c.photo}
                 alt={c.username}
                 className="w-8 h-8 rounded-full object-cover border"
               />

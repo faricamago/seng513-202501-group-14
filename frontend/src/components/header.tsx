@@ -51,11 +51,15 @@ const Header = () => {
         
         {/* Logo */}
         <Link href="/" className="flex-shrink-0 hover:cursor-pointer">
-          <img src="/assets/cuteredlogo.png" alt="Logo" className="w-20 h-auto" />
+        <img
+          src="/assets/cuteredlogo.png"
+          alt="Logo"
+          className="w-16 md:w-20 h-auto" 
+        />
         </Link>
 
         {/* Search (only flex item) */}
-        <div className="flex-1 mx-6">
+        <div className="flex-1 mx-2 md:mx-6">
           <input
             type="text"
             placeholder="Search..."

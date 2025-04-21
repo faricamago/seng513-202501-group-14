@@ -149,6 +149,14 @@ const Profile = () => {
       if (!res.ok) throw new Error("upload failed");
       const data = await res.json();
       setProfilePic(data.photo);
+       /* notify rest of the app (comments, feeds, etc.) */
+      window.dispatchEvent(
+        new CustomEvent("profilePicUpdated", {
+          detail: { username: me || profileUsername, photo: data.photo },
+        })
+      );
+      /* hard‑refresh the page so every place picks up the new avatar */
+      window.location.reload();
     } catch (err) {
       console.error(err);
     }
