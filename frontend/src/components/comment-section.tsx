@@ -99,61 +99,56 @@ const CommentSection: React.FC<{ postId: string }> = ({ postId }) => {
       <h4 className="text-xl font-bold text-[var(--primary-pink)] mb-4 border-b border-[var(--verylight-pink)] pb-2">
         Comments
       </h4>
-      {comments.length > 0 && (
-        <>
-          <button
-            onClick={() => setShowComments(!showComments)}
-            className="text-sm text-[var(--primary-pink)] font-semibold mb-4 underline hover:text-[var(--bright-pink)] transition"
-          >
-            {showComments ? "Hide comments" : "Show comments"} (
-            {comments.length})
-          </button>
-          {showComments && (
-            <div className="flex flex-col gap-4">
-              {comments.map((c) => (
-                <div
-                  key={c.index}
-                  className="p-4 bg-[var(--verylight-pink)] rounded-lg"
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-semibold text-[var(--primary-pink)]">
-                      {c.username}
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-gray-500">
-                        {new Date(c.createdAt || "").toLocaleString()}
-                      </span>
-                      {sessionStorage.getItem("username") === c.username && (
-                        <div>
-                          <button
-                            onClick={() => handleDeleteComment(c.index)}
-                            className="text-sm text-red-500 hover:underline"
-                          >
-                            Delete
-                          </button>
+      <button
+        onClick={() => setShowComments(!showComments)}
+        className="text-sm text-[var(--primary-pink)] font-semibold mb-4 underline hover:text-[var(--bright-pink)] transition"
+      >
+        {showComments ? "Hide comments" : "Show comments"} ({comments.length})
+      </button>
+      {showComments && (
+        <div className="flex flex-col gap-4">
+          {comments.map((c) => (
+            <div
+              key={c.index}
+              className="p-4 bg-[var(--verylight-pink)] rounded-lg"
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-semibold text-[var(--primary-pink)]">
+                  {c.username}
+                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-gray-500">
+                    {new Date(c.createdAt || "").toLocaleString()}
+                  </span>
+                  {sessionStorage.getItem("username") === c.username && (
+                    <div>
+                      <button
+                        onClick={() => handleDeleteComment(c.index)}
+                        className="text-sm text-red-500 hover:underline"
+                      >
+                        Delete
+                      </button>
 
-                          <button
-                            onClick={() => handleLikeComment(c.index)}
-                            className={`text-sm ${
-                              c.likes?.includes(
-                                sessionStorage.getItem("username") || ""
-                              )
-                                ? "text-[var(--primary-pink)] font-bold"
-                                : "text-gray-500"
-                            } hover:underline`}
-                          >
-                            ❤️ {c.likes?.length || 0}
-                          </button>
-                        </div>
-                      )}
+                      <button
+                        onClick={() => handleLikeComment(c.index)}
+                        className={`text-sm ${
+                          c.likes?.includes(
+                            sessionStorage.getItem("username") || ""
+                          )
+                            ? "text-[var(--primary-pink)] font-bold"
+                            : "text-gray-500"
+                        } hover:underline`}
+                      >
+                        ❤️ {c.likes?.length || 0}
+                      </button>
                     </div>
-                  </div>
-                  <p className="text-[var(--foreground)]">{c.content}</p>
+                  )}
                 </div>
-              ))}
+              </div>
+              <p className="text-[var(--foreground)]">{c.content}</p>
             </div>
-          )}
-        </>
+          ))}
+        </div>
       )}
       <form
         onSubmit={(e) => {
