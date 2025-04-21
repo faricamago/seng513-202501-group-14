@@ -6,6 +6,7 @@ import Feed from '@/components/feed';
 import { NotificationBell } from '@/components/notificationBell';
 import { useSearchParams } from 'next/navigation';
 import { MdOutlineModeEdit } from "react-icons/md";
+import { GiDinosaurRex }   from "react-icons/gi";
 import { BACKEND_PORT } from "@/common/global-vars";
 import UserList from "@/components/userList";
 
@@ -189,11 +190,17 @@ const Profile = () => {
         <NotificationBell />
       </div>
       <div className="relative inline-block">
+            {profilePic ? (
         <img
-          src={profilePic || "/sample-profile/dino2.jpg"}
+          src={profilePic}
           alt="Profile"
-          className="w-32 h-32 rounded-full border-4 border-white shadow-lg"
+          className="w-32 h-32 rounded-full border-4 border-white shadow-lg object-cover"
         />
+        ) : (
+        <GiDinosaurRex
+          className="w-32 h-32 rounded-full border-4 border-white shadow-lg text-[var(--verylight-pink)]"
+        />
+        )}
         {me === profileUsername && (
           <>
             <button

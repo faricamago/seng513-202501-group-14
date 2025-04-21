@@ -1,7 +1,8 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
-import { MdDelete, MdEdit } from "react-icons/md";
+import { MdOutlineModeEdit,  MdDeleteOutline} from "react-icons/md";
+import { GiDinosaurRex } from "react-icons/gi";
 import { BACKEND_PORT } from "@/common/global-vars";
 import { CommentType } from "./post";
 
@@ -104,9 +105,9 @@ const CommentSection: React.FC<Props> = ({
                 className="w-8 h-8 rounded-full object-cover border"
               />
             ) : (
-                <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-xs font-bold">
-                    {(c.username?.[0] || "?").toUpperCase()}
-                </div>
+                <GiDinosaurRex
+                className="w-full h-full text-[var(--verylight-pink)] rounded-full"
+             />
             )}
           </Link>
 
@@ -149,16 +150,17 @@ const CommentSection: React.FC<Props> = ({
           {/* author controls */}
           {me === c.username && editId !== c._id && (
             <div className="flex gap-1 text-lg mt-1">
-              <button
+              <button className="text-gray-500 hover:text-blue-500 transition text-2xl"
                 onClick={() => {
                   setEditId(c._id);
                   setEditText(c.content);
                 }}
               >
-                <MdEdit />
+                <MdOutlineModeEdit />
               </button>
-              <button onClick={() => deleteComment(c._id)}>
-                <MdDelete />
+              <button className="text-gray-500 hover:text-blue-500 transition text-2xl"
+                onClick={() => deleteComment(c._id)}>
+                <MdDeleteOutline />
               </button>
             </div>
           )}
