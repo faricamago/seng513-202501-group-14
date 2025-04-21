@@ -3,7 +3,7 @@ import Post from "../models/Post.js";
 
 const router = express.Router();
 
-// get comments
+// get comment
 router.get("/", async (req, res) => {
   const { postId } = req.query;
   try {
@@ -15,7 +15,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-// post comments
+// post comment
 router.post("/", async (req, res) => {
   const { postId, username, content } = req.body;
   try {
