@@ -3,13 +3,14 @@ import { GiDinosaurRex } from "react-icons/gi";
 import ResponsiveImage from "./responsive-image";
 import Link from "next/link";
 import { BiLike, BiSolidLike } from "react-icons/bi";
-//import { FaRegComment } from "react-icons/fa";
+import { FaRegComment } from "react-icons/fa";
 import PostForm from "./postForm";
 import { MdOutlineModeEdit } from "react-icons/md";
 import { MdDeleteOutline } from "react-icons/md";
 import { FaRegFlag } from "react-icons/fa";
 import { BACKEND_PORT } from "@/common/global-vars";
 import UserList from "./userList";
+import CommentSection from "./commentSection";
 
 export interface PostType {
   _id: string;
@@ -20,6 +21,7 @@ export interface PostType {
   announcement: boolean;
   createdAt: Date;
   likes: string[];
+  comments?: CommentType[]
   className?: string;
   // Admin-specific props:
   adminView?: boolean;
@@ -27,12 +29,23 @@ export interface PostType {
   onDelete?: (postId: string) => void;
 }
 
+export interface CommentType {
+  _id: string;                       
+  username: string;
+  photo?: string;
+  content: string;
+  createdAt: string | Date;
+  updatedAt?: string | Date;
+  }
+
 const Post: React.FC<PostType> = (props) => {
   // State for author's profile picture
   const [authorPhoto, setAuthorPhoto] = useState<string>("");
   const loggedInUsername = sessionStorage.getItem("username");
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(props.likes ? props.likes.length : 0);
+  const [commentList, setCommentList] = useState(props.comments || []);
+  const [showComments, setShowComments] = useState(false);
 
   // States for modals
   const [showEditModal, setShowEditModal] = useState(false);
@@ -194,6 +207,22 @@ const Post: React.FC<PostType> = (props) => {
             </button>
             <span className="text-md font-bold cursor-pointer hover:underline" onClick={() => setShowLikesModal(true)}>{likeCount}</span>
           </div>
+          
+          <div className="flex items-center gap-2">
+            <button
+              className="hover:text-blue-500 transition text-2xl"
+              onClick={() => setShowComments(!showComments)}
+            >
+              <FaRegComment />
+            </button>
+            <span
+              className="text-md font-bold cursor-pointer hover:underline"
+              onClick={() => setShowComments(!showComments)}
+            >
+              {commentList.length}
+            </span>
+          </div>
+          
           <div className="flex-grow" />
           {loggedInUsername === props.username && (
             <div className="flex items-end space-x-2 p-4">
@@ -346,7 +375,18 @@ const Post: React.FC<PostType> = (props) => {
           users={props.likes}
           onClose={() => setShowLikesModal(false)}/>
       )}
-    
+
+      {showComments && (
+        <CommentSection
+          postId={props._id}
+          initialComments={commentList}
+          onCommentsChanged={(list) => {
+            setCommentList(list);
+            // auto‑open once the first comment is added
+            if (list.length > 0 && !showComments) setShowComments(true);
+          }}
+        />
+      )}
     </div>
   );
 };

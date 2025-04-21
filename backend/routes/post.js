@@ -1,5 +1,6 @@
 import express from 'express';
 import * as postController from '../controllers/postController.js';
+import * as commentController from '../controllers/commentController.js';
 import { upload } from '../controllers/upload.js';
 
 const router = express.Router();
@@ -21,6 +22,11 @@ router.delete('/:id', postController.deletePost);
 
 // Report a post
 router.post('/report', postController.reportPost);
+
+// comment routes
+router.post('/:id/comments',               commentController.addComment);
+router.put('/:postId/comments/:commentId', commentController.updateComment);
+router.delete('/:postId/comments/:commentId', commentController.deleteComment);
 
 export default router;
 

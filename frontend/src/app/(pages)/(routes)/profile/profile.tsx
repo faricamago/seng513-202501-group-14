@@ -6,6 +6,7 @@ import Feed from '@/components/feed';
 import { NotificationBell } from '@/components/notificationBell';
 import { useSearchParams } from 'next/navigation';
 import { MdOutlineModeEdit } from "react-icons/md";
+import { GiDinosaurRex }   from "react-icons/gi";
 import { BACKEND_PORT } from "@/common/global-vars";
 import UserList from "@/components/userList";
 
@@ -148,6 +149,14 @@ const Profile = () => {
       if (!res.ok) throw new Error("upload failed");
       const data = await res.json();
       setProfilePic(data.photo);
+       /* notify rest of the app (comments, feeds, etc.) */
+      window.dispatchEvent(
+        new CustomEvent("profilePicUpdated", {
+          detail: { username: me || profileUsername, photo: data.photo },
+        })
+      );
+      /* hard‑refresh the page so every place picks up the new avatar */
+      window.location.reload();
     } catch (err) {
       console.error(err);
     }
@@ -189,11 +198,17 @@ const Profile = () => {
         <NotificationBell />
       </div>
       <div className="relative inline-block">
+            {profilePic ? (
         <img
-          src={profilePic || "/sample-profile/dino2.jpg"}
+          src={profilePic}
           alt="Profile"
-          className="w-32 h-32 rounded-full border-4 border-white shadow-lg"
+          className="w-32 h-32 rounded-full border-4 border-white shadow-lg object-cover"
         />
+        ) : (
+        <GiDinosaurRex
+          className="w-32 h-32 rounded-full border-4 border-white shadow-lg text-[var(--verylight-pink)]"
+        />
+        )}
         {me === profileUsername && (
           <>
             <button
@@ -264,9 +279,14 @@ const Profile = () => {
               </div>
             </div>
           ) : (
+            <div className="relative group">
             <p onClick={() => { setNewBio(bio); setIsEditingBio(true); }}>
               {bio || "Click to add bio."}
             </p>
+            <span className="absolute left-1/2 -translate-x-1/2 top-full mt-1 px-2 py-1 text-xs text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                Click to edit your bio
+            </span>
+            </div>
           )
         :
           <p>{bio}</p>
