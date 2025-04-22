@@ -7,6 +7,7 @@ Dinoverse is a social media platform designed to streamline university communica
 - Aarushi Roy Choudhury - UCID: 30113987
 - Farica Mago - UCID: 30111924
 - Cole Briggs - UCID: 30149709
+- Samin Rashid Khondaker - UCID: 30143490
 
 ## Project Structure
 
