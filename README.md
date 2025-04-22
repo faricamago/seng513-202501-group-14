@@ -27,7 +27,7 @@ root/
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/yourusername/dinoverse.git
+   git clone https://github.com/faricamago/seng513-202501-group-14.git
    cd dinoverse
    ```
 
