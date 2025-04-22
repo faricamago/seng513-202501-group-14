@@ -31,7 +31,7 @@ root/
 
 #### Firebase Configuration
 
-Several Firebase-related files are required but not included in the repository:
+Several Firebase-related files are required but not included in the repository (for security purposes like secret API keys):
 
 - `dinoverse-file-uploads-firebase-adminsdk-fbsvc-3163feb581.json`
 - `firebase-admin-config.js`
