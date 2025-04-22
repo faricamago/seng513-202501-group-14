@@ -38,10 +38,7 @@ Several Firebase-related files are required but not included in the repository:
 - `firebaseStorageHelper.js`
 - `firebase-config.js`
 
-To request access to these files, please contact the following project members:
-
-- aarushi.roychoudh1@ucalgary.ca
-- farica.mago@ucalgary.ca
+To request access to these files, please contact:
 - cole.briggs@ucalgary.ca
 
 ### Run the App
