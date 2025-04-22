@@ -37,6 +37,7 @@ Several Firebase-related files are required but not included in the repository (
 - `firebase-admin-config.js`
 - `firebaseStorageHelper.js`
 - `firebase-config.js`
+- `.env`
 
 To request access to these files, please contact:
 - cole.briggs@ucalgary.ca
