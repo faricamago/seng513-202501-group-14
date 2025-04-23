@@ -49,7 +49,7 @@ const Header = () => {
     <header className="fixed top-0 left-0 w-full z-40 bg-[var(--primary-pink)] border-b-8 border-[var(--uoc-yellow)] md:px-16">
       <div className="flex items-center justify-between h-20 px-6">
         
-        {/* Logo */}
+       
         <Link href="/" className="flex-shrink-0 hover:cursor-pointer">
         <img
           src="/assets/cuteredlogo.png"
@@ -58,7 +58,7 @@ const Header = () => {
         />
         </Link>
 
-        {/* Search (only flex item) */}
+        
         <div className="flex-1 mx-2 md:mx-6">
           <input
             type="text"
@@ -77,7 +77,7 @@ const Header = () => {
           />
         </div>
 
-        {/* Right‑side controls */}
+        
         <div className="flex items-center space-x-4">
           {role === 'admin' && (
             <button
@@ -112,7 +112,7 @@ const Header = () => {
         </div>
       </div>
 
-      {/* Logout Confirmation Modal */}
+      
       {showLogoutModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-[rgba(0,0,0,0.5)] z-50">
           <div className="bg-white p-8 rounded-xl shadow-2xl max-w-md mx-auto transform transition duration-300 hover:scale-105">

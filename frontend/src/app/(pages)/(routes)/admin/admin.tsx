@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect, Suspense } from "react";
-import { PostType } from "@/components/post"; // Adjust this path as needed
-import Post from "@/components/post"; // Reuse the same Post component
+import { PostType } from "@/components/post";
+import Post from "@/components/post";
 import { BACKEND_PORT } from "@/common/global-vars";
 
 const Admin = () => {

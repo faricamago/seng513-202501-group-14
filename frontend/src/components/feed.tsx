@@ -1,5 +1,5 @@
 "use client";
-import React, { Suspense, useEffect, useState } from "react";
+import React, {  useEffect, useState } from "react";
 import Post from "./post";
 import { PostType } from "./post";
 import { useSearchParams } from "next/navigation";
@@ -16,7 +16,6 @@ const Feed: React.FC<FeedProps> = ({ className, filterBy, filterByUser }) => {
   const searchParams = useSearchParams();
   const queryParam = searchParams.get("query") || "";
 
-  //loading state added
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

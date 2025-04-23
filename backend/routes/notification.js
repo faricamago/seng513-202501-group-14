@@ -1,4 +1,5 @@
 // routes/notifications.js
+
 import express from 'express';
 import {
   getUserNotifications,

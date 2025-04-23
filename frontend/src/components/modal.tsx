@@ -10,10 +10,10 @@ interface ModalProps {
 export default function Modal({ children, onClose }: ModalProps) {
   const [el] = useState(() => document.getElementById('modal-root')!)
   useEffect(() => {
-    // Lock scroll
+
     document.body.style.overflow = 'hidden';
 
-    // Close on ESC
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         onClose();
@@ -22,7 +22,7 @@ export default function Modal({ children, onClose }: ModalProps) {
     window.addEventListener('keydown', handleKeyDown);
 
     return () => {
-      // Cleanup
+      
       document.body.style.overflow = '';
       window.removeEventListener('keydown', handleKeyDown);
     };

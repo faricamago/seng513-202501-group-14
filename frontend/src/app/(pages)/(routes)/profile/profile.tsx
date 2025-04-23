@@ -27,10 +27,10 @@ const Profile = () => {
   const [showModalType, setShowModalType] = useState<"followers" | "following" | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // current logged-in user
+  
   const me = typeof window !== "undefined" ? sessionStorage.getItem("username") : "";
 
-  // 1) Determine which profile to show
+  // Determine which profile to show
   useEffect(() => {
     const queryUsername = searchParams.get("username");
     const loggedInUsername = typeof window !== "undefined" ? sessionStorage.getItem("username") : "";
@@ -49,7 +49,7 @@ const Profile = () => {
     }
   }, [profileUsername]);
 
-  // 2) Fetch profile picture & bio
+  // Fetch profile picture & bio
   useEffect(() => {
     if (!profileUsername) return;
     fetch(
@@ -63,11 +63,11 @@ const Profile = () => {
       .catch((err) => console.error(err));
   }, [profileUsername]);
 
-  // 3) Central reload of follow data
+  // Central reload of follow data
   const reloadFollowData = useCallback(async () => {
     if (!profileUsername) return;
     try {
-      // a) Who follows *this* profile?
+      // Who follows this profile?
       const fRes = await fetch(
         `http://localhost:${BACKEND_PORT}/api/users/followers?username=${profileUsername}`
       );
@@ -76,7 +76,7 @@ const Profile = () => {
         setFollowers(arr);
       }
 
-      // b) Who does *this* profile follow? (for "Following" count)
+      // Who does this profile follow? (for "Following" count)
       const gRes = await fetch(
         `http://localhost:${BACKEND_PORT}/api/users/following?username=${profileUsername}`
       );
@@ -85,7 +85,7 @@ const Profile = () => {
         setFollowing(arr);
       }
 
-      // c) Do I follow *this* profile?
+      // Do I follow this profile?
       if (me) {
         const myRes = await fetch(
           `http://localhost:${BACKEND_PORT}/api/users/following?username=${me}`
@@ -111,7 +111,7 @@ const Profile = () => {
     return () => window.removeEventListener("followChanged", handler);
   }, [reloadFollowData]);
 
-  // 4) Toggle follow/unfollow on this profile
+  // Toggle follow/unfollow on this profile
   const handleProfileFollowToggle = async () => {
     if (!me) return;
     try {
@@ -132,7 +132,7 @@ const Profile = () => {
     }
   };
 
-  // 5) Profile-pic upload
+  // Profile-pic upload
   const handleProfilePicChange = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -149,20 +149,20 @@ const Profile = () => {
       if (!res.ok) throw new Error("upload failed");
       const data = await res.json();
       setProfilePic(data.photo);
-       /* notify rest of the app (comments, feeds, etc.) */
+       // notify rest of the app (comments, feeds, etc.)
       window.dispatchEvent(
         new CustomEvent("profilePicUpdated", {
           detail: { username: me || profileUsername, photo: data.photo },
         })
       );
-      /* hard‑refresh the page so every place picks up the new avatar */
+      // hard‑refresh the page so every place picks up the new avatar
       window.location.reload();
     } catch (err) {
       console.error(err);
     }
   };
 
-  // 6) Bio edit handlers
+  // Bio edit handlers
   const handleCancelBio = () => {
     setNewBio(bio);
     setIsEditingBio(false);
@@ -191,7 +191,7 @@ const Profile = () => {
     }
   };
 
-  // 7) Render
+
   return (
     <div className="flex flex-col items-center min-h-screen bg-transparent p-4">
       <div className="absolute top-4 right-4">

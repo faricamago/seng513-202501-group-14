@@ -27,7 +27,7 @@ const CommentSection: React.FC<Props> = ({
   const [editId, setEditId]     = useState<string | null>(null);
   const [editText, setEditText] = useState("");
 
-  /* ---------- login‑modal state (same pattern as Footer) ---------- */
+ 
   const [showLoginModal, setShowLoginModal] = useState(false);
 
   const goToLogin = () => {
@@ -35,13 +35,13 @@ const CommentSection: React.FC<Props> = ({
     window.location.href = "/login";
   };
 
-  /* ---------- helpers ---------- */
+ 
   const syncState = (list: CommentType[]) => {
     setComments(list);
     onCommentsChanged(list);
   };
 
-  /* ---------- CRUD ---------- */
+  
   const addComment = async () => {
     if (!me) { setShowLoginModal(true); return; }
     if (!newText.trim()) return;
@@ -90,7 +90,7 @@ const CommentSection: React.FC<Props> = ({
     syncState(post.comments);
   };
 
-  /* fetch current photos for all unique commenters */
+  // fetch current photos for all unique commenters
     useEffect(() => {
         (async () => {
         const need: string[] = [];
@@ -122,14 +122,14 @@ const CommentSection: React.FC<Props> = ({
       }, []);
       
 
-  /* ---------- UI ---------- */
+ 
   return (
     <div className="px-6 pb-4 mt-2 space-y-4">
 
-      {/* existing comments */}
+      
       {comments.map((c) => (
         <div key={c._id} className="flex gap-3 text-sm">
-          {/* avatar */}
+        
           <Link href={`/profile?username=${c.username}`}>
             {(avatars[c.username] || c.photo) ? (
               <img
@@ -144,7 +144,7 @@ const CommentSection: React.FC<Props> = ({
             )}
           </Link>
 
-          {/* body */}
+         
           <div className="flex-1">
             <Link
               href={`/profile?username=${c.username}`}
@@ -180,7 +180,7 @@ const CommentSection: React.FC<Props> = ({
             )}
           </div>
 
-          {/* author controls */}
+          
           {me === c.username && editId !== c._id && (
             <div className="flex gap-1 text-lg mt-1">
               <button className="text-gray-500 hover:text-blue-500 transition text-2xl"
@@ -200,7 +200,7 @@ const CommentSection: React.FC<Props> = ({
         </div>
       ))}
 
-      {/* add‑new or login prompt */}
+      
       <div className="flex gap-2">
             <textarea
             value={newText}
@@ -218,7 +218,7 @@ const CommentSection: React.FC<Props> = ({
             </button>
         </div>
 
-      {/* -------- login modal -------- */}
+      
       {showLoginModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-[rgba(0,0,0,0.5)] z-50">
           <div className="bg-white p-8 rounded-xl shadow-2xl max-w-md mx-auto transform transition-all duration-300 hover:scale-105">

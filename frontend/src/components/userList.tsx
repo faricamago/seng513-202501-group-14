@@ -20,7 +20,7 @@ interface UserCardProps {
   loggedInUsername: string | null;
 }
 
-// Reusable card for a single user
+
 const UserCard: React.FC<UserCardProps> = ({
   username,
   profilePic,
@@ -93,7 +93,7 @@ const UserCard: React.FC<UserCardProps> = ({
   );
 };
 
-// Main user list component
+
 const UserList: React.FC<UserListProps> = ({
   users,
   title = 'Users',
@@ -105,7 +105,7 @@ const UserList: React.FC<UserListProps> = ({
     typeof window !== 'undefined' ? sessionStorage.getItem('username') : null;
 
   useEffect(() => {
-    // 1) Fetch all profile pics
+   
     users.forEach(async (u) => {
       try {
         const res = await fetch(
@@ -119,7 +119,7 @@ const UserList: React.FC<UserListProps> = ({
         console.error('Profile pic fetch error:', err);
       }
     });
-    // 2) Fetch my following list once
+    
     if (loggedInUsername) {
       fetch(
         `http://localhost:${BACKEND_PORT}/api/users/following?username=${loggedInUsername}`

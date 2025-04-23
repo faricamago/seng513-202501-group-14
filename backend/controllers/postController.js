@@ -10,7 +10,7 @@ const createPost = async (req, res) => {
     const { title, content, username } = req.body;
     let imageUrls = [];
 
-    // If files are uploaded, upload each to Firebase Storage and collect the URLs.
+    
     if (req.files && req.files.length > 0) {
       const uploadPromises = req.files.map(async (file) => {
         const url = await uploadImage(file);
@@ -19,7 +19,7 @@ const createPost = async (req, res) => {
       imageUrls = await Promise.all(uploadPromises);
     }
 
-    // Create the post using the Firebase image URLs.
+    
     const postData = { title, content, username, images: imageUrls };
 
     const post = await Post.create(postData);
@@ -35,9 +35,9 @@ const createPost = async (req, res) => {
 
 const getPosts = async (req, res) => {
   try {
-    // Build a filter for posts that are not reported.
+    
     let filter = { reported: false };
-    // If a search query is provided, search in both title and content.
+   
     const searchQuery = req.query.query;
     if (searchQuery) {
       filter.$or = [
@@ -102,25 +102,24 @@ const updatePost = async (req, res) => {
       newImageUrls = await Promise.all(uploadPromises);
     }
 
-    // Retrieve the original post
+    
     const originalPost = await Post.findById(req.params.id);
     if (!originalPost) {
       return res.status(404).json({ error: "Post not found" });
     }
 
-    // Find which images were removed (those in original but not in keptImagesArray)
+    
     const removedImages = originalPost.images.filter((imgUrl) => !keptImagesArray.includes(imgUrl));
 
-    // For each removed image, delete it from Firebase Storage.
     for (const url of removedImages) {
       const storagePath = getStoragePathFromUrl(url);
       await deleteFileFromFirebase(storagePath);
     }
 
-    // Combine kept images and new uploads
+   
     const combinedImages = [...keptImagesArray, ...newImageUrls];
 
-    // Update the post.
+    
     const post = await Post.findByIdAndUpdate(
       req.params.id,
       { title, content, images: combinedImages },
@@ -142,7 +141,7 @@ const deletePost = async (req, res) => {
       return res.status(404).json({ error: "Post not found" });
     }
 
-    // Delete each image from Firebase Storage.
+    
     if (post.images && post.images.length > 0) {
       for (const url of post.images) {
         const storagePath = getStoragePathFromUrl(url);
@@ -150,7 +149,7 @@ const deletePost = async (req, res) => {
       }
     }
 
-    // Delete the post record.
+  
     await Post.findByIdAndDelete(req.params.id);
     res.status(200).json({ message: "Post deleted successfully" });
   } catch (error) {
@@ -167,12 +166,12 @@ const reportPost = async (req, res) => {
       return res.status(404).json({ error: 'Post not found' });
     }
 
-    // Mark the post as reported so it's hidden from the regular feed
+    
     post.reported = true;
     
     await post.save();
 
-    // create a “reported” notification for the author
+   
     await Notification.create({
       user: post.username,
       postId: post._id,

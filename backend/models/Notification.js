@@ -3,12 +3,12 @@ import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
 const notificationSchema = new Schema({
-  user: {                // the post author’s username
+  user: {                
     type: String,
     required: true,
     index: true
   },
-  postId: {              // reference to the post
+  postId: {              
     type: Schema.Types.ObjectId,
     ref: 'Post',
     required: true
@@ -26,7 +26,7 @@ const notificationSchema = new Schema({
     type: String,
     required: true
   },
-  read: {                // for dismissing
+  read: {                
     type: Boolean,
     default: false
   }
