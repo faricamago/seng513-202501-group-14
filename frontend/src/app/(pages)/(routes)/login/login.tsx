@@ -3,7 +3,7 @@ import { BACKEND_PORT } from '@/common/global-vars';
 import React, { useState } from 'react';
 
 const Login = () => {
-  const [email, setEmail] = useState(''); // Changed from username to email
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -16,7 +16,7 @@ const Login = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          email,      // sending email (not username) to the backend
+          email,      
           password,
         }),
       });
@@ -27,11 +27,11 @@ const Login = () => {
         return;
       }
       const data = await res.json();
-      // Store the returned username (from the database) for further use.
+    
       sessionStorage.setItem("username", data.user.username);
       sessionStorage.setItem("role", data.user.role);
       console.log("Logged in with username:", data.user.username);
-      // Redirect based on user role: admin goes to /admin, others to /profile
+     
       if (data.user.role === "admin") {
         window.location.href = '/admin';
       } else {
@@ -82,7 +82,7 @@ const Login = () => {
           </p>
         </form>
       </div>
-      {/* Error Modal (styled exactly like Header's logout modal) */}
+      
       {showErrorModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-[rgba(0,0,0,0.5)] z-50">
           <div className="bg-white p-8 rounded-xl shadow-2xl max-w-md mx-auto transform transition-all duration-300 hover:scale-105">

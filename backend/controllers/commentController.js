@@ -1,11 +1,10 @@
 // controllers/commentController.js
+
 import mongoose from 'mongoose';
 import Post from '../models/Post.js';
 import User from '../models/User.js';
 
-/*  POST /api/posts/:id/comments
- *  body: { username, content }
- */
+
 export const addComment = async (req, res) => {
   try {
     const { username, content } = req.body;
@@ -33,10 +32,7 @@ export const addComment = async (req, res) => {
   }
 };
 
-/*  PUT /api/posts/:postId/comments/:commentId
- *  body: { username, content }
- *  Only the comment’s author may update.
- */
+
 export const updateComment = async (req, res) => {
   try {
     const { postId, commentId } = req.params;
@@ -60,9 +56,7 @@ export const updateComment = async (req, res) => {
   }
 };
 
-/*  DELETE /api/posts/:postId/comments/:commentId
- *  Only the comment’s author may delete.
- */
+
 export const deleteComment = async (req, res) => {
   try {
     const { postId, commentId } = req.params;

@@ -5,14 +5,14 @@ import User from '../models/User.js';
 import { getStoragePathFromUrl, deleteFileFromFirebase } from "../firebaseStorageHelper.js";
 import bcryptjs from 'bcryptjs';
 
-// controllers/userController.js
+
 export const registerUser = async (req, res) => {
   try {
-    // Validate the email
+   
     if (!req.body.email.endsWith('@ucalgary.ca')) {
       return res.status(400).json({ error: 'Email must be a valid UCalgary email address' });
     }
-    // Ensure the bio is never empty by setting default text if not provided or blank
+   
     if (!req.body.bio || req.body.bio.trim() === "") {
       req.body.bio = "This is my bio. Edit to update your profile.";
     }
@@ -24,7 +24,6 @@ export const registerUser = async (req, res) => {
   }
 };
 
-// User login endpoint
 export const loginUser = async (req, res) => {
   try {
     const user = await User.findOne({ email: req.body.email });
@@ -32,27 +31,25 @@ export const loginUser = async (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    // Use bcrypt.compare to check if the entered password matches the hashed password
     const isMatch = await bcryptjs.compare(req.body.password, user.password);
     if (!isMatch) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    // In production, generate and return an authentication token here.
     res.status(200).json({ message: 'Login successful', user });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
 
-// Follow a user
+
 export const followUser = async (req, res) => {
   try {
     const { follower, following } = req.body;
     if (follower === following) {
       return res.status(400).json({ error: "Cannot follow yourself" });
     }
-    // Update the follower's following list and the following user's followers list.
+  
     await User.findOneAndUpdate(
       { username: follower },
       { $addToSet: { following: following } },
@@ -69,7 +66,6 @@ export const followUser = async (req, res) => {
   }
 };
 
-// Get the list of users that a given user is following
 export const getFollowing = async (req, res) => {
   try {
     const { username } = req.query;
@@ -81,7 +77,6 @@ export const getFollowing = async (req, res) => {
   }
 };
 
-// Get the list of users that a given user is following
 export const getFollowers = async (req, res) => {
   try {
     const { username } = req.query;
@@ -93,7 +88,7 @@ export const getFollowers = async (req, res) => {
   }
 };
 
-// Unfollow a user
+
 export const unfollowUser = async (req, res) => {
   console.log("unfollowUser called with body:", req.body);
     try {
@@ -124,17 +119,15 @@ export const unfollowUser = async (req, res) => {
         return res.status(400).json({ error: "No file uploaded." });
       }
   
-      // Find current user to get the old photo URL.
       const currentUser = await User.findOne({ username });
       const oldPhotoUrl = currentUser ? currentUser.photo : null;
   
-      // Upload the new profile picture to Firebase Storage.
+     
       const fileUrl = await uploadImage(req.file);
       if (!fileUrl) {
         return res.status(500).json({ error: "Failed to upload file." });
       }
   
-      // If there is an old photo and it's a Firebase URL different from the new one, delete the old file.
       if (
         oldPhotoUrl &&
         oldPhotoUrl.startsWith("https://") &&
@@ -146,7 +139,6 @@ export const unfollowUser = async (req, res) => {
         }
       }
   
-      // Update the user's document with the new photo URL.
       const updatedUser = await User.findOneAndUpdate(
         { username },
         { photo: fileUrl },
@@ -163,7 +155,6 @@ export const unfollowUser = async (req, res) => {
     }
   };
 
-// Get user profile by username
 export const getUserProfile = async (req, res) => {
   try {
     const { username } = req.query;
@@ -171,7 +162,7 @@ export const getUserProfile = async (req, res) => {
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
-    // Return user data; optionally remove sensitive fields like password.
+   
     const { password, ...userData } = user.toObject();
     res.status(200).json(userData);
   } catch (err) {

@@ -39,7 +39,7 @@ export interface CommentType {
   }
 
 const Post: React.FC<PostType> = (props) => {
-  // State for author's profile picture
+  
   const [authorPhoto, setAuthorPhoto] = useState<string>("");
   const loggedInUsername = sessionStorage.getItem("username");
   const [isLiked, setIsLiked] = useState(false);
@@ -47,7 +47,7 @@ const Post: React.FC<PostType> = (props) => {
   const [commentList, setCommentList] = useState(props.comments || []);
   const [showComments, setShowComments] = useState(false);
 
-  // States for modals
+  
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showReportConfirm, setShowReportConfirm] = useState(false);
@@ -67,7 +67,7 @@ const Post: React.FC<PostType> = (props) => {
     window.location.href = "/login";
   };
 
-  // Fetch author's profile photo
+  
   useEffect(() => {
     async function fetchAuthorPhoto() {
       try {
@@ -179,7 +179,7 @@ const Post: React.FC<PostType> = (props) => {
     }
   };
 
-  // Render controls based on adminView prop.
+  
   const renderControls = () => {
     if (props.adminView === true) {
       return (
@@ -333,7 +333,7 @@ const Post: React.FC<PostType> = (props) => {
           </div>
         </div>
       )}
-      {/* Report Confirmation Modal on show if logged in!*/}
+     
       {showReportConfirm && (
         <div className="fixed inset-0 flex items-center justify-center bg-[rgba(0,0,0,0.5)] z-50">
           <div className="bg-white p-8 rounded-xl shadow-2xl max-w-md mx-auto transform transition-all duration-300 hover:scale-105">
@@ -351,7 +351,7 @@ const Post: React.FC<PostType> = (props) => {
         </div>
       )}
 
-      {/* Login Confirmation Modal */}
+     
       {showLoginModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-[rgba(0,0,0,0.5)] z-50">
           <div className="bg-white p-8 rounded-xl shadow-2xl max-w-md mx-auto transform transition-all duration-300 hover:scale-105">

@@ -2,12 +2,12 @@ import React, { useState, useRef } from "react";
 
 interface PostFormProps {
   onCancel: () => void;
-  // onPost receives title, content, newImages (files added now) and keptImages (existing images that are not removed)
+  
   onPost: (data: { title: string; content: string; newImages: File[]; keptImages: string[] }) => void;
   isEdit?: boolean;
   initialTitle?: string;
   initialContent?: string;
-  initialImages?: string[]; // Already uploaded image URLs (from Firebase)
+  initialImages?: string[]; 
 }
 
 const PostForm: React.FC<PostFormProps> = ({
@@ -20,9 +20,9 @@ const PostForm: React.FC<PostFormProps> = ({
 }) => {
   const [title, setTitle] = useState(initialTitle);
   const [content, setContent] = useState(initialContent);
-  // State for images that have already been uploaded (Firebase URLs)
+  
   const [existingImages, setExistingImages] = useState<string[]>([...initialImages]);
-  // State for newly added images (File objects)
+
   const [newImages, setNewImages] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -33,12 +33,12 @@ const PostForm: React.FC<PostFormProps> = ({
     setNewImages(prev => [...prev, ...Array.from(e.target.files || [])]);
   };
 
-  // Remove an image from existing (already uploaded) images
+ 
   const removeExistingImage = (index: number) => {
     setExistingImages(prev => prev.filter((_, i) => i !== index));
   };
 
-  // Remove a newly added image
+
   const removeNewImage = (index: number) => {
     setNewImages(prev => prev.filter((_, i) => i !== index));
   };
@@ -51,7 +51,7 @@ const PostForm: React.FC<PostFormProps> = ({
       return;
     }
     onPost({ title, content, newImages, keptImages: existingImages });
-    //window.location.reload();
+    
     //wait for 1 second before reloading the page to allow the post to be created
     setTimeout(() => {
         window.location.reload();
@@ -60,7 +60,7 @@ const PostForm: React.FC<PostFormProps> = ({
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col">
-      {/* Title */}
+      
       <div className="p-2">
         <label className="block text-gray-700 font-semibold mb-1">Title*</label>
         <input
@@ -71,7 +71,7 @@ const PostForm: React.FC<PostFormProps> = ({
           className="w-full border border-gray-300 rounded p-2 mb-2 focus:outline-none"
         />
       </div>
-      {/* Content */}
+      
       <div className="p-2">
         <label className="block text-gray-700 font-semibold mb-1">Content*</label>
         <textarea
@@ -81,7 +81,7 @@ const PostForm: React.FC<PostFormProps> = ({
           className="w-full border border-gray-300 rounded p-2 mb-2 focus:outline-none h-40"
         />
       </div>
-      {/* Existing Images Section (visible in edit mode) */}
+      
       {isEdit && existingImages.length > 0 && (
         <div className="p-2">
           <p className="text-gray-700 font-semibold mb-1">Existing Images</p>
@@ -89,7 +89,7 @@ const PostForm: React.FC<PostFormProps> = ({
             {existingImages.map((imgUrl, index) => (
               <div key={index} className="relative">
                 <img
-                  src={imgUrl}  // Using the Firebase URL directly.
+                  src={imgUrl}  
                   alt={`Existing preview ${index}`}
                   className="w-16 h-16 object-cover rounded"
                 />
@@ -105,7 +105,7 @@ const PostForm: React.FC<PostFormProps> = ({
           </div>
         </div>
       )}
-      {/* New Images Section */}
+     
       <div className="p-2">
         <label className="block text-gray-700 font-semibold mb-1">Images</label>
         <button
@@ -148,7 +148,7 @@ const PostForm: React.FC<PostFormProps> = ({
           )}
         </div>
       </div>
-      {/* Form Buttons */}
+     
       <div className="flex justify-center space-x-4 p-4">
         <button
           type="button"

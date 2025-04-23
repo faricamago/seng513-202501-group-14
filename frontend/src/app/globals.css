@@ -19,18 +19,6 @@
   @apply outline-none p-4;
 }
 
-/* for pink */
-/* :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --bright-pink: #F7AFBB;
-  --primary-pink: #EF7B8E;
-  --secondary-pink: #FBCCD4;
-  --verylight-pink: #FDEDEE;
-  --dark-color:#594856;
-} */
-
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

@@ -1,11 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Link from "next/link";
 import { LuEarth, LuSchool } from "react-icons/lu";
 import { MdOutlinePeopleAlt, MdOutlinePersonOutline } from "react-icons/md";
 import { FiPlus } from "react-icons/fi";
-import TipTapEditor from "./TipTapEditor"; // adjust the path as needed
 import PostForm from "./postForm";
 import { BACKEND_PORT } from "@/common/global-vars";
 
@@ -23,24 +21,21 @@ const Footer: React.FC = () => {
   }, []);
 
   const confirmPost = () => {
-    // In a real scenario, you may want to get the editor content via context or refs.
-    // For now, this placeholder simply logs a confirmation.
+
     console.log("Post confirmed");
     setShowPostModal(false);
   };
 
   const handlePost = async (data: { title: string; content: string; newImages?: File[]; keptImages?: string[] }) => {
     if (!data.title || !data.content) {
-      // alert("Please fill in the title and content.");
       return;
     }
-    // Create a FormData object to send files and other fields
+   
     const formData = new FormData();
     formData.append("title", data.title);
     formData.append("content", data.content);
-    formData.append("username", username); // Replace with the actual user id
+    formData.append("username", username); 
     
-    // Append new image files if they exist (for a new post, keptImages will be empty)
     if (data.newImages && data.newImages.length > 0) {
       data.newImages.forEach((file) => {
         formData.append("images", file);
@@ -82,7 +77,6 @@ const Footer: React.FC = () => {
 
   const handleFollowersClick = () => {
     if (username) {
-      // Navigate to feed page with filter parameter set to "following"
       window.location.href = "/following";
     } else {
       setLoginMessage("Login to see posts from followers");
@@ -110,7 +104,7 @@ const Footer: React.FC = () => {
     <footer>
       <nav className="fixed bottom-0 left-0 w-full h-16 z-40 flex bg-[var(--primary-pink)] text-white border-t-8 border-[var(--uoc-yellow)]">
         
-        {/* See All Posts Button */}
+      
         <button className="relative group flex-1 flex group h-full items-center justify-center p-4 hover:cursor-pointer hover:bg-[var(--hover-primary-pink)]" onClick={handleWorldClick}>
           <LuEarth className="text-3xl group-hover:text-[var(--uoc-yellow)] cursor-pointer" />
           <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-sm text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity">
@@ -118,7 +112,7 @@ const Footer: React.FC = () => {
           </span>
         </button>
 
-        {/* University Posts Button */}
+       
         <button className="relative group flex-1 flex group items-center justify-center p-4 hover:cursor-pointer hover:bg-[var(--hover-primary-pink)]" onClick={handleAnnouncementsClick}>
           <LuSchool className="text-3xl group-hover:text-[var(--uoc-yellow)] cursor-pointer" />
           <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-sm text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity">
@@ -126,7 +120,7 @@ const Footer: React.FC = () => {
           </span>
         </button>
          
-        {/* New Post Button */}
+       
         <div className="group flex-1 flex items-center justify-center relative">
           <div className="bg-white text-[var(--primary-pink)] w-15 h-12 flex items-center justify-center 
                         rounded-md border-2 border-[var(--primary-pink)] absolute -top-4 cursor-pointer"
@@ -138,7 +132,7 @@ const Footer: React.FC = () => {
           </span>
         </div>
 
-        {/* Friends Button */}
+      
         <button className="relative group flex-1 flex group items-center justify-center p-4 hover:cursor-pointer hover:bg-[var(--hover-primary-pink)]" onClick={handleFollowersClick}>
           <MdOutlinePeopleAlt className="text-3xl group-hover:text-[var(--uoc-yellow)] cursor-pointer" />
           <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-sm text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity">
@@ -146,7 +140,7 @@ const Footer: React.FC = () => {
           </span>
         </button>
 
-        {/* Profile Button */}
+       
         <button className="relative group flex-1 flex group items-center justify-center p-4 hover:cursor-pointer hover:bg-[var(--hover-primary-pink)]" onClick={handleProfileClick}>
           <MdOutlinePersonOutline className="text-3xl group-hover:text-[var(--uoc-yellow)] cursor-pointer" />
           <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-sm text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity">
